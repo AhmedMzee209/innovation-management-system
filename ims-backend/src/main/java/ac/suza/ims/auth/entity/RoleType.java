@@ -1,0 +1,14 @@
+package ac.suza.ims.auth.entity;
+
+public enum RoleType {
+    SUPER_ADMIN,
+    INNOVATION_DIRECTOR,
+    CENTRAL_INNOVATION_MANAGER,
+    SCHOOL_INNOVATION_MANAGER,
+    MENTOR,
+    REVIEWER,
+    STUDENT,
+    ALUMNI,
+    INVESTOR,
+    PUBLIC_VISITOR
+}
