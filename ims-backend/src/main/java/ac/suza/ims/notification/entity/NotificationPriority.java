@@ -1,0 +1,8 @@
+package ac.suza.ims.notification.entity;
+
+public enum NotificationPriority {
+    LOW,
+    MEDIUM,
+    HIGH,
+    URGENT
+}
