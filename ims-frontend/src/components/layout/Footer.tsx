@@ -4,7 +4,7 @@ import { MapPin, Mail, Phone, Globe, ExternalLink } from 'lucide-react';
 
 const usefulLinks = [
   'State House', 'Vice President\'s Office', "Prime Minister's Office",
-  'Ministry of Education', 'Tanzania Government Portal', 'HESLB',
+  'Ministry of Education', 'Tanzania Government Portal',
 ];
 
 const quickLinks = [
@@ -15,6 +15,12 @@ const quickLinks = [
 export const Footer = () => {
   return (
     <footer>
+      {/* ── Decorative Top Border ── */}
+      <div className="flex h-1.5 w-full">
+        <div className="flex-1" style={{ backgroundColor: '#e8b800' }} />
+        <div className="flex-1" style={{ backgroundColor: '#3cb371' }} />
+      </div>
+
       {/* ── Main Footer Body ── */}
       <div style={{ backgroundColor: '#0098c8' }} className="pt-12 pb-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
