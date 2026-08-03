@@ -1,342 +1,208 @@
-# Innovation Management System (IMS) - Backend Documentation
+# Innovation Management System (IMS) — SUZA
 
-![Java 21](https://img.shields.io/badge/Java-21-orange.svg)
-![Spring Boot 3](https://img.shields.io/badge/Spring_Boot-3.x-green.svg)
+![Java](https://img.shields.io/badge/Java-17-orange.svg)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.x-green.svg)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15%2B-blue.svg)
-![Security](https://img.shields.io/badge/Spring_Security-JWT-red.svg)
+![React](https://img.shields.io/badge/React-19-61DAFB.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6.svg)
+![Vite](https://img.shields.io/badge/Vite-6.x-646CFF.svg)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-06B6D4.svg)
 ![License](https://img.shields.io/badge/Institution-SUZA-blue.svg)
+![Status](https://img.shields.io/badge/Backend-Complete-brightgreen.svg)
+![Status](https://img.shields.io/badge/Frontend-In_Progress-yellow.svg)
 
-An enterprise-grade **Innovation Management System (IMS)** backend built for the **State University of Zanzibar (SUZA)**. The system provides a centralized platform that supports the complete innovation lifecycle—from initial idea submission, evaluation, and incubation to startup development, mentorship, funding, competition management, and reporting.
+An enterprise-grade **Innovation Management System (IMS)** built for the **State University of Zanzibar (SUZA)**. The system provides a centralized platform that supports the complete innovation lifecycle — from idea submission, evaluation, and incubation to startup development, mentorship, funding, competition management, and institutional reporting.
 
 ---
 
 ## 📑 Table of Contents
 
 - [1. Executive Summary & Vision](#1-executive-summary--vision)
-- [2. Technology Stack](#2-technology-stack)
-- [3. Backend Architecture & Principles](#3-backend-architecture--principles)
-- [4. Package Structure](#4-package-structure)
-- [5. System Enumerations & Common Entities](#5-system-enumerations--common-entities)
-- [6. Phased Implementation Roadmap](#6-phased-implementation-roadmap)
-- [7. Standardized Module Build Order](#7-standardized-module-build-order)
-- [8. Key Milestone Deliverables](#8-key-milestone-deliverables)
-- [9. Configuration & Environment Setup](#9-configuration--environment-setup)
-- [10. API Documentation & Swagger](#10-api-documentation--swagger)
+- [2. Repository Structure](#2-repository-structure)
+- [3. Backend — Technology Stack](#3-backend--technology-stack)
+- [4. Backend — Architecture & Package Structure](#4-backend--architecture--package-structure)
+- [5. Backend — Implemented Modules](#5-backend--implemented-modules)
+- [6. Backend — Configuration & Running](#6-backend--configuration--running)
+- [7. Frontend — Technology Stack](#7-frontend--technology-stack)
+- [8. Frontend — Folder Structure](#8-frontend--folder-structure)
+- [9. Frontend — Implementation Roadmap](#9-frontend--implementation-roadmap)
+- [10. Development Order](#10-development-order)
+- [11. API Documentation](#11-api-documentation)
 
 ---
 
 ## 1. Executive Summary & Vision
 
-The **Innovation Management System (IMS)** is a multi-tier enterprise web application designed to foster, structure, and scale innovation across the academic and research ecosystem at SUZA. 
+The **IMS** is a multi-tier enterprise web application designed to foster, structure, and scale innovation across the academic and research ecosystem at SUZA.
 
 ### Core Capabilities
-- **Role-Based Access Control (RBAC)**: Secure access for Students, Staff, Hub Managers, Reviewers, Mentors, Investors, and University Admins.
-- **Innovation Lifecycle Management**: Idea submission, status tracking, multi-criteria evaluations, and approval workflows.
-- **Organization Management**: Multi-school, department, and innovation hub administration.
-- **Startup Incubation**: Transforming approved innovations into registered startups with member management and progress tracking.
-- **Mentorship & Coaching**: Mentor assignment, session scheduling, and feedback loops.
-- **Funding & Grants**: Opportunity listing, grant applications, review, and funding awards.
-- **Competitions & Hackathons**: Registration, panel judge evaluations, scoring, and leaderboard results.
-- **Document & Notification Hub**: Centralized file repository with version control and real-time/in-app notifications.
+- **Role-Based Access Control (RBAC)** — Students, Staff, Hub Managers, Reviewers, Mentors, Investors, Admins
+- **Innovation Lifecycle Management** — Idea submission, status tracking, multi-criteria evaluations, approval workflows
+- **Organization Management** — Multi-school, department, and innovation hub administration
+- **Startup Incubation** — Transforming approved innovations into registered startups with team and progress tracking
+- **Mentorship & Coaching** — Mentor assignment, session scheduling, and feedback loops
+- **Funding & Grants** — Opportunity listing, grant applications, review, and funding awards
+- **Competitions & Hackathons** — Registration, judge evaluations, scoring, and leaderboard results
+- **Document & Notification Hub** — Centralized file repository with version control and in-app notifications
+- **Dashboard & Analytics** — Role-based dashboards with KPIs, charts, and trend tracking
+- **Public Showcase** — Public-facing portal for discovering innovations and success stories
 
 ---
 
-## 2. Technology Stack
+## 2. Repository Structure
 
-| Component | Technology / Library | Version | Description |
+```
+innovation_system/
+├── ims-backend/          # Spring Boot 4.x REST API (✅ COMPLETE)
+├── ims-frontend/         # React 19 + Vite frontend (🚧 IN PROGRESS)
+├── docs/                 # Architecture diagrams & documentation
+└── README.md             # This file
+```
+
+---
+
+## 3. Backend — Technology Stack
+
+| Component | Technology | Version | Notes |
 |---|---|---|---|
-| **Language** | Java | 21 (LTS) | Core programming language |
-| **Framework** | Spring Boot | 3.x / 4.x | Enterprise application framework |
-| **Data Persistence** | Spring Data JPA (Hibernate) | 3.x | Code-First ORM and repository abstraction |
-| **Database** | PostgreSQL | 15+ | Relational DBMS for high-concurrency storage |
-| **Security** | Spring Security & JWT | - | Token-based stateless authentication & RBAC |
-| **Mapping** | MapStruct | 1.5+ | High-performance type-safe DTO mapper |
-| **Boilerplate Reduction**| Lombok | Latest | Automated getters, setters, builders, constructors |
-| **Validation** | Bean Validation (Jakarta) | 3.x | Declarative request DTO validation |
-| **API Specs & Docs** | Swagger / OpenAPI | 3.0 | Automated interactive API documentation |
-| **Testing** | JUnit 5, Mockito | 5.x | Unit and integration testing framework |
-| **Containerization** | Docker / Docker Compose | - | Container orchestration (production readiness) |
+| **Language** | Java | 17 | Core language |
+| **Framework** | Spring Boot | 4.x | Enterprise framework |
+| **Persistence** | Spring Data JPA (Hibernate) | 3.x | Code-First ORM |
+| **Database** | PostgreSQL | 15+ | Relational DBMS |
+| **Security** | Spring Security + JWT (JJWT) | 0.12.6 | Stateless auth + RBAC |
+| **Mapping** | MapStruct | 1.5.5 | Type-safe DTO mapper |
+| **Boilerplate** | Lombok | Latest | Reduced boilerplate |
+| **Validation** | Jakarta Bean Validation | 3.x | Request DTO validation |
+| **API Docs** | SpringDoc OpenAPI (Swagger) | 2.6.0 | Interactive API docs |
+| **Testing** | JUnit 5, Mockito, Spring Security Test | 5.x | Unit & integration tests |
 
 ---
 
-## 3. Backend Architecture & Principles
+## 4. Backend — Architecture & Package Structure
 
-The backend is built following **Clean Architecture** and **Domain-Driven Design (DDD)** modularity. The flow of data strictly moves through isolated structural layers:
+### Layered Architecture
 
 ```
-                          ┌────────────────────────┐
-                          │     Client / Frontend  │
-                          └───────────┬────────────┘
-                                      │ REST API (JSON)
-                                      ▼
-                          ┌────────────────────────┐
-                          │       Controller       │  (DTO Validation & Swagger Specs)
-                          └───────────┬────────────┘
-                                      │
-                                      ▼
-                          ┌────────────────────────┐
-                          │    Service Layer       │  (Business Logic & Transactions)
-                          └───────────┬────────────┘
-                                      │
-                                      ▼
-                          ┌────────────────────────┐
-                          │    Repository Layer    │  (Spring Data JPA Interfaces)
-                          └───────────┬────────────┘
-                                      │
-                                      ▼
-                          ┌────────────────────────┐
-                          │   Hibernate ORM Layer  │  (JPA Entities & BaseEntity)
-                          └───────────┬────────────┘
-                                      │
-                                      ▼
-                          ┌────────────────────────┐
-                          │   PostgreSQL Database  │  (Relational Persistence)
-                          └────────────────────────┘
+Client / Frontend
+      │ REST API (JSON)
+      ▼
+  Controller        ← DTO Validation & Swagger Specs
+      │
+      ▼
+  Service Layer     ← Business Logic & Transactions
+      │
+      ▼
+  Repository Layer  ← Spring Data JPA Interfaces
+      │
+      ▼
+  Hibernate ORM     ← JPA Entities & BaseEntity
+      │
+      ▼
+  PostgreSQL DB     ← Relational Persistence
 ```
 
-### Cross-Cutting Components
-- **Spring Security & JWT Filter**: Intercepts requests, validates authorization headers, populates Security Context.
-- **Global Exception Handler (`@RestControllerAdvice`)**: Traps exceptions and translates them into uniform JSON responses (`ApiResponse<T>`).
-- **MapStruct DTO Mapping**: Prevents entity exposure on REST endpoints by handling bidirectional DTO conversions.
-- **Jakarta Bean Validation**: Enforces input constraints (`@NotNull`, `@NotBlank`, `@Size`, `@Email`, etc.) at the Controller layer.
-
----
-
-## 4. Package Structure
-
-The project follows a domain-driven, modular package layout under root package `ac.suza.ims`:
+### Package Structure (`ac.suza.ims`)
 
 ```
 ac.suza.ims
-│
-├── auth                 # Authentication & authorization endpoints & logic
-├── common               # Base classes (BaseEntity, ApiResponse, Constants)
-├── config               # Configuration beans (Swagger, CORS, Security, JPA)
-├── security             # Security filters, UserDetailsService, JWT Utilities
-├── exception            # GlobalExceptionHandler and custom runtime exceptions
-├── dto                  # Transfer objects (Requests & Responses)
-├── mapper               # MapStruct mapper interfaces
-├── util                 # Helper and utility classes
-├── enums                # System-wide enumerations
-│
-├── organization         # Schools, Departments, Innovation Hubs
-├── innovation           # Innovations, Categories, Stages, Status History
-├── review               # Reviewers, Evaluations, Criteria, Scoring
-├── startup              # Startups, Members, Progress, Achievements
-├── mentorship           # Mentors, Session Scheduling, Feedback
-├── funding              # Funding Programs, Applications, Awards
-├── competition          # Competitions, Registrations, Judges, Leaderboards
-├── document             # Document Storage, Versioning, Categories
-├── notification         # In-app, Email, Broadcast Notifications
-└── report               # Reporting Engine, Analytics Dashboards
+├── auth             # Authentication & authorization
+├── common           # BaseEntity, ApiResponse, Constants
+├── config           # Swagger, CORS, Security, JPA config
+├── security         # JWT filter, UserDetailsService, JWT util
+├── exception        # GlobalExceptionHandler, custom exceptions
+├── enums            # System-wide enumerations
+├── util             # Helper & utility classes
+├── organization     # Schools, Departments, Innovation Hubs
+├── innovation       # Innovations, Categories, Stages, Status History
+├── review           # Reviewers, Evaluations, Criteria, Scoring
+├── startup          # Startups, Members, Progress, Achievements
+├── mentorship       # Mentors, Sessions, Feedback
+├── funding          # Funding Programs, Applications, Awards
+├── competition      # Competitions, Registrations, Judges, Leaderboards
+├── opportunity      # Opportunities & Applications
+├── document         # Document Storage, Versioning
+├── notification     # In-app, Email, Broadcast Notifications
+├── dashboard        # Dashboard Widgets & Analytics Snapshots
+├── showcase         # Public Innovation Showcase
+└── report           # Reporting Engine
 ```
 
----
+### Base Entity Pattern
 
-## 5. System Enumerations & Common Entities
-
-### Base Entity Pattern (`BaseEntity.java`)
-Every persistent JPA entity extends an abstract `BaseEntity` to guarantee auditability and uniform primary key strategies:
-
-```java
-@MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
-@Getter
-@Setter
-public abstract class BaseEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
-
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @CreatedBy
-    @Column(name = "created_by")
-    private String createdBy;
-
-    @LastModifiedBy
-    @Column(name = "updated_by")
-    private String updatedBy;
-
-    @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted = false;
-}
-```
+Every JPA entity extends `BaseEntity` which provides:
+- UUID primary key (`@GeneratedValue(strategy = UUID)`)
+- Audit fields: `createdAt`, `updatedAt`, `createdBy`, `updatedBy`
+- Soft delete flag: `isDeleted`
 
 ### Core Business Enumerations
-- **RoleType**: `ROLE_STUDENT`, `ROLE_STAFF`, `ROLE_INNOVATOR`, `ROLE_HUB_MANAGER`, `ROLE_REVIEWER`, `ROLE_MENTOR`, `ROLE_INVESTOR`, `ROLE_ADMIN`
-- **InnovationStage**: `IDEA`, `PROTOTYPE`, `VALIDATION`, `MVP`, `SCALING`, `COMMERCIALIZED`
-- **InnovationStatus**: `SUBMITTED`, `UNDER_REVIEW`, `NEEDS_REVISION`, `APPROVED`, `REJECTED`, `INCUBATED`
-- **ReviewStatus**: `PENDING`, `IN_PROGRESS`, `COMPLETED`, `DECLINED`
-- **FundingStatus**: `OPEN`, `UNDER_EVALUATION`, `AWARDED`, `CLOSED`, `REJECTED`
-- **CompetitionStatus**: `DRAFT`, `UPCOMING`, `ACTIVE`, `EVALUATION`, `COMPLETED`
+
+| Enum | Values |
+|---|---|
+| **RoleType** | `ROLE_STUDENT`, `ROLE_STAFF`, `ROLE_INNOVATOR`, `ROLE_HUB_MANAGER`, `ROLE_REVIEWER`, `ROLE_MENTOR`, `ROLE_INVESTOR`, `ROLE_ADMIN` |
+| **InnovationStage** | `IDEA`, `PROTOTYPE`, `VALIDATION`, `MVP`, `SCALING`, `COMMERCIALIZED` |
+| **InnovationStatus** | `SUBMITTED`, `UNDER_REVIEW`, `NEEDS_REVISION`, `APPROVED`, `REJECTED`, `INCUBATED` |
+| **ReviewStatus** | `PENDING`, `IN_PROGRESS`, `COMPLETED`, `DECLINED` |
+| **FundingStatus** | `OPEN`, `UNDER_EVALUATION`, `AWARDED`, `CLOSED`, `REJECTED` |
+| **CompetitionStatus** | `DRAFT`, `UPCOMING`, `ACTIVE`, `EVALUATION`, `COMPLETED` |
 
 ---
 
-## 6. Phased Implementation Roadmap
+## 5. Backend — Implemented Modules
 
-### 🚀 Phase 0 – Project Initialization (Day 1)
-- Set up Maven dependencies (`spring-boot-starter-webmvc`, `spring-boot-starter-data-jpa`, `postgresql`, `spring-boot-starter-security`, `validation`, `lombok`, `mapstruct`, `jwt`, `springdoc-openapi`).
-- Configure `application.yml`, `application-dev.yml`, and `application-prod.yml`.
-- Configure PostgreSQL database connections, Hibernate Code-First ddl-auto settings, CORS, and Swagger UI.
-- Establish the `ac.suza.ims` domain package structure.
-- Implement common utility classes (`BaseEntity`, `ApiResponse`, `GlobalExceptionHandler`, `ResourceNotFoundException`).
+All 20 backend modules are **✅ COMPLETE**:
 
-### 🔐 Phase 1 – Authentication & RBAC (Days 1–2)
-- **Entities**: `User`, `Role`, `Permission` (User ↔ Role [M:N], Role ↔ Permission [M:N]).
-- **Features**: Registration, Login, JWT Token Generation & Refresh Token Handling, Password Encryption (BCrypt), Current User Provider (`@CurrentUser`).
-- **Core APIs**:
-  - `POST /auth/login`
-  - `POST /auth/register`
-  - `POST /auth/refresh`
-  - `GET /auth/me`
-- **Checklist**: ✔ Login ✔ JWT Authentication Filter ✔ Role-based Method Security ✔ Swagger Annotations ✔ Postman Verification.
+| # | Module | Key Entities | Status |
+|---|---|---|---|
+| 0 | **Foundation** | BaseEntity, ApiResponse, GlobalExceptionHandler | ✅ |
+| 1 | **Auth & RBAC** | User, Role, Permission + JWT | ✅ |
+| 2 | **Organization** | School, Department, InnovationHub | ✅ |
+| 3 | **User Management** | User Profile, Activation | ✅ |
+| 4 | **Innovation** | Innovation, Category, Stage, StatusHistory | ✅ |
+| 5 | **Review** | Reviewer, Evaluation, Criteria, Comment | ✅ |
+| 6 | **Startup** | Startup, StartupMember, Progress, Achievement | ✅ |
+| 7 | **Mentorship** | Mentor, Assignment, Session, Feedback | ✅ |
+| 8 | **Funding** | FundingProgram, FundingApplication, Award | ✅ |
+| 9 | **Competition** | Competition, Registration, Judge, Result | ✅ |
+| 10 | **Opportunity** | Opportunity, OpportunityApplication | ✅ |
+| 11 | **Document** | Document, DocumentVersion, DocumentCategory | ✅ |
+| 12 | **Notification** | Notification, Announcement, Broadcast | ✅ |
+| 13 | **Dashboard** | DashboardWidget, AnalyticsSnapshot | ✅ |
+| 14 | **Showcase** | ShowcaseItem, ShowcaseCategory | ✅ |
+| 15 | **Report** | Reporting Engine, Aggregated Metrics | ✅ |
 
-### 🏫 Phase 2 – Organization Module (Day 3)
-- **Entities**: `School`, `Department`, `InnovationHub`.
-- **APIs**:
-  - `GET /api/v1/schools` | `POST /api/v1/schools` | `PUT /api/v1/schools/{id}` | `DELETE /api/v1/schools/{id}`
-  - `GET /api/v1/departments` | `POST /api/v1/departments`
-  - `GET /api/v1/hubs` | `POST /api/v1/hubs`
+### Standardized Module Build Order
 
-### 👤 Phase 3 – User Management Module (Day 4)
-- **Features**: Profile Expansion (Bio, Photo URL, Address, Preferences), User Account Activation/Deactivation, User Directory Search.
-- **APIs**:
-  - `GET /api/v1/users/profile`
-  - `PUT /api/v1/users/profile`
-  - `PUT /api/v1/users/{id}/deactivate`
-  - `GET /api/v1/users/search`
-
-### 💡 Phase 4 – Innovation Module (Days 5–6)
-- **Entities**: `Innovation`, `Category`, `Stage`, `StatusHistory`.
-- **Features**: Submission workflow, stage movement, manager approvals/rejections, search and filtering by category/hub.
-- **APIs**:
-  - `POST /api/v1/innovations`
-  - `GET /api/v1/innovations`
-  - `GET /api/v1/innovations/{id}`
-  - `PUT /api/v1/innovations/{id}`
-  - `DELETE /api/v1/innovations/{id}`
-
-### 🔍 Phase 5 – Review Module (Day 7)
-- **Entities**: `Reviewer`, `Evaluation`, `Criteria`, `Comment`.
-- **Workflow**: `Innovation` ➔ Assign Reviewer ➔ Conduct Evaluation ➔ Submit Score & Decision (Approve/Reject/Revise).
-- **APIs**:
-  - `POST /api/v1/reviews/assign`
-  - `POST /api/v1/reviews/evaluate`
-  - `GET /api/v1/reviews/innovation/{id}`
-
-### 🏢 Phase 6 – Startup Module (Day 8)
-- **Entities**: `Startup`, `StartupMember`, `Progress`, `Achievement`.
-- **Workflow**: Approved `Innovation` ➔ Incubate as `Startup` ➔ Add Co-founders/Team Members ➔ Track Key Milestones & Achievements.
-- **APIs**:
-  - `POST /api/v1/startups`
-  - `POST /api/v1/startups/{id}/members`
-  - `POST /api/v1/startups/{id}/progress`
-
-### 🤝 Phase 7 – Mentorship Module (Day 9)
-- **Entities**: `Mentor`, `Assignment`, `Session`, `Feedback`.
-- **APIs**:
-  - `POST /api/v1/mentorship/mentors`
-  - `POST /api/v1/mentorship/assignments`
-  - `POST /api/v1/mentorship/sessions`
-
-### 💰 Phase 8 – Funding Module (Day 10)
-- **Entities**: `FundingProgram`, `FundingApplication`, `Award`.
-- **Workflow**: Publish Funding Program ➔ Innovators Apply ➔ Selection Committee Review ➔ Grant Award Disbursement.
-- **APIs**:
-  - `GET /api/v1/funding/programs`
-  - `POST /api/v1/funding/applications`
-  - `PUT /api/v1/funding/applications/{id}/award`
-
-### 🏆 Phase 9 – Competition Module (Day 11)
-- **Entities**: `Competition`, `Registration`, `Judge`, `Result`.
-- **APIs**:
-  - `POST /api/v1/competitions`
-  - `POST /api/v1/competitions/{id}/register`
-  - `POST /api/v1/competitions/scores`
-
-### 📄 Phase 10 – Document Module (Day 12)
-- **Entities**: `Document`, `Category`, `Version`.
-- **Features**: File Upload (Proposal attachments, pitch decks), Download, Category Tagging, Versioning.
-
-### 🔔 Phase 11 – Notification Module (Day 13)
-- **Features**: System In-App Alerts, Email Dispatch triggers, Broadcast Announcements across hubs.
-
-### 📊 Phase 12 – Reporting & Dashboard Module (Day 14)
-- **Features**: Aggregated metrics dashboards (Users, Innovations submitted vs approved, Funding distributed, Startups spawned).
-
----
-
-## 7. Standardized Module Build Order
-
-For **every** business domain module added to the project, follow this exact sequence to maintain code consistency:
+For every module, the strict build sequence is:
 
 ```
- 1. Entity (JPA Mappings & Annotations)
-    ↓
- 2. Enum (Domain Constants & Statuses)
-    ↓
- 3. Repository (Spring Data JPA Interface)
-    ↓
- 4. DTO (Request & Response Records/Classes)
-    ↓
- 5. Mapper (MapStruct Converter Interface)
-    ↓
- 6. Service Interface (Contract Definition)
-    ↓
- 7. Service Implementation (@Service & Transactional Logic)
-    ↓
- 8. Controller (@RestController & Endpoint Definitions)
-    ↓
- 9. Validation (Bean Validation annotations on DTOs)
-    ↓
-10. Exception Handling (Domain-specific error responses)
-    ↓
-11. Swagger Documentation (@Operation, @ApiResponse annotations)
-    ↓
-12. Postman / Integration Testing (API Verification)
+1. Entity → 2. Enum → 3. Repository → 4. DTO → 5. Mapper
+      → 6. Service Interface → 7. Service Impl → 8. Controller
+      → 9. Validation → 10. Exception Handling → 11. Swagger → 12. Testing
 ```
 
 ---
 
-## 8. Key Milestone Deliverables
-
-| Milestone | Target Horizon | Expected Deliverables |
-|---|---|---|
-| **Week 1** | Days 1 – 7 | Project initialization, Auth & JWT Security, RBAC setup, Organization Module, Expanded User Profiles, Innovation Module, Review Module. |
-| **Week 2** | Days 8 – 14 | Startup Incubation, Mentorship Engine, Funding & Grant System, Competitions, Document Management, Notification Dispatcher, Reporting Dashboards & End-to-End API Integration Testing. |
-
----
-
-## 9. Configuration & Environment Setup
+## 6. Backend — Configuration & Running
 
 ### Prerequisites
-- **JDK**: Java 21 LTS
-- **Build Tool**: Apache Maven 3.9+ (or included `./mvnw`)
-- **Database**: PostgreSQL 15+ running locally or in Docker
+
+- Java 17 LTS
+- Apache Maven 3.9+ (or use `./mvnw`)
+- PostgreSQL 15+ (local or Docker)
 
 ### Database Setup
-Create the PostgreSQL database instance:
+
 ```sql
 CREATE DATABASE ims_db;
 CREATE USER ims_user WITH PASSWORD 'ims_password';
 GRANT ALL PRIVILEGES ON DATABASE ims_db TO ims_user;
 ```
 
-### Application Properties Configuration (`application-dev.yml`)
+### `application-dev.yml`
+
 ```yaml
 server:
   port: 8080
-  servlet:
-    context-path: /
 
 spring:
   datasource:
@@ -344,7 +210,6 @@ spring:
     username: ims_user
     password: ims_password
     driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -356,35 +221,322 @@ spring:
 
 jwt:
   secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-  expiration-ms: 86400000 # 24 hours
-  refresh-expiration-ms: 604800000 # 7 days
+  expiration-ms: 86400000       # 24 hours
+  refresh-expiration-ms: 604800000  # 7 days
 ```
 
-### Building & Running the Application
+### Running the Backend
 
-1. **Clone & Navigate to Backend**:
-   ```bash
-   cd ims-backend
-   ```
+```bash
+# Navigate to backend
+cd ims-backend
 
-2. **Build with Maven**:
-   ```bash
-   ./mvnw clean compile
-   ```
+# Build
+./mvnw clean compile
 
-3. **Run Dev Server**:
-   ```bash
-   ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
-   ```
+# Run with dev profile
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+```
+
+- **Swagger UI**: http://localhost:8080/swagger-ui.html
+- **OpenAPI JSON**: http://localhost:8080/v3/api-docs
+
+---
+
+## 7. Frontend — Technology Stack
+
+| Library | Version | Purpose |
+|---|---|---|
+| **React** | 19 | Core UI framework |
+| **Vite** | 6.x | Build tool & dev server |
+| **TypeScript** | 5.x | Type-safe JavaScript |
+| **Tailwind CSS** | 3.x | Utility-first styling |
+| **React Router DOM** | 6.x | Client-side routing |
+| **TanStack Query** | 5.x | Server state & data fetching |
+| **Axios** | 1.x | HTTP client |
+| **React Hook Form** | 7.x | Performant form management |
+| **Zod** | 3.x | Schema validation |
+| **Redux Toolkit** | 2.x | Auth & global state |
+| **TanStack Table** | 8.x | Headless data tables |
+| **Recharts** | 2.x | Composable chart library |
+| **Lucide React** | Latest | Icon library |
+| **Framer Motion** | 11.x | Animations & transitions |
+| **Sonner** | 1.x | Toast notifications |
 
 ---
 
-## 10. API Documentation & Swagger
+## 8. Frontend — Folder Structure
 
-When the Spring Boot application is running, open your browser and access interactive API documentation:
-
-- **Swagger UI**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
-- **OpenAPI Specs (JSON)**: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
+```
+src/
+├── app/              # App entry, providers, root setup
+├── assets/           # Static assets (images, fonts, icons)
+├── components/
+│   ├── common/       # Reusable generic components
+│   ├── forms/        # Form components & inputs
+│   ├── tables/       # Table components
+│   ├── charts/       # Chart wrappers
+│   ├── cards/        # Card components
+│   ├── modal/        # Modal dialogs
+│   ├── ui/           # Base UI primitives
+│   ├── layout/       # Layout building blocks
+│   └── feedback/     # Loading, errors, empty states
+├── hooks/            # Custom React hooks
+├── layouts/          # Page layout shells (Dashboard, Public, Auth)
+├── pages/            # Route-level page components
+├── routes/           # Route definitions & protected routes
+├── services/         # Axios API service modules
+├── store/            # Redux Toolkit slices & store
+├── types/            # TypeScript interfaces & types
+├── utils/            # Helper functions & utilities
+├── constants/        # App-wide constants & enums
+├── contexts/         # React context providers
+└── styles/           # Global CSS & Tailwind customizations
+```
 
 ---
-*Maintained by the State University of Zanzibar (SUZA) Innovation Management System Engineering Team.*
+
+## 9. Frontend — Implementation Roadmap
+
+### Phase 0 — Frontend Foundation
+> **Objective**: Prepare a scalable, production-ready React application shell.
+
+**Tasks**
+- [ ] Create React + Vite + TypeScript project
+- [ ] Configure Tailwind CSS with custom design tokens
+- [ ] Configure React Router DOM with route structure
+- [ ] Configure Axios with base URL & interceptors
+- [ ] Configure Redux Toolkit (auth & global state slices)
+- [ ] Configure TanStack Query (QueryClient & Provider)
+- [ ] Configure React Hook Form & Zod resolver
+- [ ] Configure Theme Provider (light / dark mode)
+- [ ] Configure application Layout shells
+- [ ] Configure Protected Routes with role guards
+- [ ] Configure Sonner toast notifications
+- [ ] Configure Global Loading & Error Boundary
+
+**Deliverables**: App Layout (Sidebar, Top Nav, Footer), Route Structure, Theme System
+
+---
+
+### Phase 1 — Landing Website
+> **Objective**: Create the public-facing marketing website.
+
+**Pages**: Home, About IMS, Innovation Ecosystem, Schools, Innovation Hubs, Success Stories, Public Showcase, Events, Contact, FAQ, Login
+
+**Components**: Hero Section, Statistics, Feature Cards, Innovation Cards, Partner Logos, Testimonials, Footer, Navbar
+
+---
+
+### Phase 2 — Authentication
+> **Pages**: Login, Forgot Password, Reset Password, Verify Email, Unauthorized, Forbidden
+
+**Components**: Login Form, Password Strength Indicator, Remember Me, Social Login Placeholder
+
+---
+
+### Phase 3 — Dashboard Framework
+> **Objective**: Shared dashboard layout used by all role-based dashboards.
+
+**Layout**: Sidebar, Top Navigation, Breadcrumb, Notifications, User Menu, Theme Switch, Search Bar, Profile Dropdown
+
+**Components**: KPI Cards, Charts, Recent Activities, Quick Actions
+
+---
+
+### Phase 4 — User & RBAC Management
+> **Pages**: Users List, Create User, Edit User, User Profile, Roles, Permissions
+
+**Components**: User Table, Role Matrix, Permission Matrix, Profile Card
+
+---
+
+### Phase 5 — Organization Management
+> **Pages**: Schools, Departments, Innovation Hubs, Innovation Managers
+
+**Components**: School Card, Hub Card, Tree View, Statistics
+
+---
+
+### Phase 6 — Innovation Management
+> **Pages**: Innovation List, Submit Innovation, Innovation Details, My Innovations, Categories
+
+**Components**: Innovation Card, Innovation Timeline, Status Badge, Upload Documents, Filters
+
+---
+
+### Phase 7 — Review & Evaluation
+> **Pages**: Reviews, Assigned Reviews, Evaluation Form, Evaluation History
+
+**Components**: Score Card, Evaluation Matrix, Comments Panel, Decision Dialog
+
+---
+
+### Phase 8 — Startup Management
+> **Pages**: Startup List, Startup Details, Team Members, Milestones, Achievements, Progress
+
+**Components**: Startup Card, Timeline, Team Table, Progress Chart
+
+---
+
+### Phase 9 — Mentorship
+> **Pages**: Mentors, Sessions, Feedback, Action Plans
+
+**Components**: Calendar, Session Card, Mentor Profile, Feedback Timeline
+
+---
+
+### Phase 10 — Funding
+> **Pages**: Funding Programs, Apply for Funding, Funding Applications, Disbursements
+
+**Components**: Funding Card, Budget Chart, Milestone Tracker
+
+---
+
+### Phase 11 — Competition
+> **Pages**: Competitions, Register for Competition, Judges, Results
+
+**Components**: Competition Card, Ranking Table, Score Matrix, Prize Cards
+
+---
+
+### Phase 12 — Opportunity
+> **Pages**: Opportunities, Apply for Opportunity, My Applications
+
+**Components**: Opportunity Cards, Filters, Application Timeline
+
+---
+
+### Phase 13 — Document Management
+> **Pages**: Documents, Upload, Preview, Version History
+
+**Components**: File Explorer, Preview Panel, Version Timeline
+
+---
+
+### Phase 14 — Notification & Messaging
+> **Pages**: Notifications, Messages, Conversations, Announcements
+
+**Components**: Chat Window, Notification Bell, Conversation List
+
+---
+
+### Phase 15 — Dashboards & Analytics
+> **Role-based dashboards**: Super Admin, Director, Central Manager, School Manager, Mentor, Reviewer, Student
+
+**Charts**: Line, Bar, Pie, Area  
+**KPI Cards**: Users, Innovations, Startups, Funding, Competitions
+
+---
+
+### Phase 16 — Public Showcase
+> **Pages**: Showcase, Success Stories, Startup Profiles, Innovation Profiles, Gallery
+
+**Components**: Showcase Cards, Gallery, Search, Categories
+
+---
+
+### Phase 17 — System Administration
+> **Pages**: Settings, Audit Logs, Activity Logs, Preferences, System Health
+
+**Components**: Settings Form, Toggle Cards, Audit Table, Health Dashboard
+
+---
+
+### Phase 18 — Frontend Integration & Production
+**Tasks**
+- [ ] Connect all APIs to backend endpoints
+- [ ] Complete authentication flow with JWT refresh
+- [ ] Implement route protection per role
+- [ ] Global error handling & retry logic
+- [ ] Loading states & skeleton loaders
+- [ ] Pagination, sorting, filtering, search
+- [ ] Responsive design (mobile → desktop)
+- [ ] Accessibility (WCAG 2.1 AA)
+- [ ] Performance optimization (Lighthouse ≥ 90)
+- [ ] Lazy loading & code splitting
+- [ ] Cross-browser testing
+- [ ] Final UI polish & QA
+
+---
+
+## 10. Development Order
+
+```
+Phase 0  → Foundation & Setup
+      ↓
+Phase 1  → Landing Website
+      ↓
+Phase 2  → Authentication
+      ↓
+Phase 3  → Dashboard Layout
+      ↓
+Phase 4  → Users & RBAC
+      ↓
+Phase 5  → Organization
+      ↓
+Phase 6  → Innovation
+      ↓
+Phase 7  → Review & Evaluation
+      ↓
+Phase 8  → Startup Management
+      ↓
+Phase 9  → Mentorship
+      ↓
+Phase 10 → Funding
+      ↓
+Phase 11 → Competition
+      ↓
+Phase 12 → Opportunity
+      ↓
+Phase 13 → Document Management
+      ↓
+Phase 14 → Notification & Messaging
+      ↓
+Phase 15 → Dashboards & Analytics
+      ↓
+Phase 16 → Public Showcase
+      ↓
+Phase 17 → System Administration
+      ↓
+Phase 18 → API Integration & Production
+```
+
+---
+
+## 11. API Documentation
+
+When the backend is running:
+
+| Resource | URL |
+|---|---|
+| **Swagger UI** | http://localhost:8080/swagger-ui.html |
+| **OpenAPI JSON** | http://localhost:8080/v3/api-docs |
+
+### Key API Endpoints
+
+| Module | Method | Endpoint |
+|---|---|---|
+| Auth | `POST` | `/auth/login` |
+| Auth | `POST` | `/auth/register` |
+| Auth | `POST` | `/auth/refresh` |
+| Auth | `GET` | `/auth/me` |
+| Organizations | `GET/POST` | `/api/v1/schools` |
+| Organizations | `GET/POST` | `/api/v1/departments` |
+| Organizations | `GET/POST` | `/api/v1/hubs` |
+| Users | `GET/PUT` | `/api/v1/users/profile` |
+| Innovations | `GET/POST` | `/api/v1/innovations` |
+| Reviews | `POST` | `/api/v1/reviews/assign` |
+| Reviews | `POST` | `/api/v1/reviews/evaluate` |
+| Startups | `GET/POST` | `/api/v1/startups` |
+| Mentorship | `GET/POST` | `/api/v1/mentorship/sessions` |
+| Funding | `GET/POST` | `/api/v1/funding/programs` |
+| Competitions | `GET/POST` | `/api/v1/competitions` |
+| Documents | `GET/POST` | `/api/v1/documents` |
+| Notifications | `GET` | `/api/v1/notifications` |
+| Dashboard | `GET` | `/api/v1/dashboard/widgets` |
+| Showcase | `GET` | `/api/v1/showcase` |
+
+---
+
+*Maintained by the State University of Zanzibar (SUZA) — Innovation Management System Engineering Team.*
