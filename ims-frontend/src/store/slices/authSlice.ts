@@ -1,40 +1,59 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { UserProfile } from '@/types/auth';
 
 interface AuthState {
   isAuthenticated: boolean;
-  user: any | null; // Will define type later
-  token: string | null;
-  roles: string[];
+  user: UserProfile | null;
+  status: 'idle' | 'loading' | 'success' | 'failed';
+  error: string | null;
+  rememberMe: boolean;
+  token: string | null; // For future real auth, mocking it for now
 }
 
 const initialState: AuthState = {
   isAuthenticated: false,
   user: null,
+  status: 'idle',
+  error: null,
+  rememberMe: false,
   token: null,
-  roles: [],
 };
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setCredentials: (
-      state,
-      action: PayloadAction<{ user: any; token: string; roles: string[] }>
-    ) => {
+    loginStart: (state) => {
+      state.status = 'loading';
+      state.error = null;
+    },
+    loginSuccess: (state, action: PayloadAction<{ user: UserProfile; token: string }>) => {
+      state.status = 'success';
       state.user = action.payload.user;
       state.token = action.payload.token;
-      state.roles = action.payload.roles;
       state.isAuthenticated = true;
+      state.error = null;
+    },
+    loginFailure: (state, action: PayloadAction<string>) => {
+      state.status = 'failed';
+      state.error = action.payload;
+      state.isAuthenticated = false;
     },
     logout: (state) => {
       state.user = null;
       state.token = null;
-      state.roles = [];
       state.isAuthenticated = false;
+      state.status = 'idle';
+      state.error = null;
+    },
+    setRememberMe: (state, action: PayloadAction<boolean>) => {
+      state.rememberMe = action.payload;
+    },
+    clearError: (state) => {
+      state.error = null;
     },
   },
 });
 
-export const { setCredentials, logout } = authSlice.actions;
+export const { loginStart, loginSuccess, loginFailure, logout, setRememberMe, clearError } = authSlice.actions;
 export default authSlice.reducer;

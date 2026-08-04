@@ -1,14 +1,7 @@
-import { Navigate, Outlet } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/store';
-import { ROUTES } from '@/constants/routes';
+import { Outlet } from 'react-router-dom';
 
 export const PublicRoute = () => {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-
-  if (isAuthenticated) {
-    return <Navigate to={ROUTES.PROTECTED.DASHBOARD} replace />;
-  }
-
+  // Public route can be seen by both logged in and logged out users.
+  // We don't restrict access here.
   return <Outlet />;
 };

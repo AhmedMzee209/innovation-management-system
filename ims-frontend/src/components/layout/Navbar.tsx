@@ -164,7 +164,7 @@ export const Navbar = () => {
       {/* ═══════════════════════════════════════════════════
           TIER 3 — Main Navigation Bar (solid teal)
       ═══════════════════════════════════════════════════ */}
-      <nav style={{ backgroundColor: C.teal }}>
+      <nav style={{ backgroundColor: C.teal, borderBottom: `4px solid ${C.gold}` }}>
         <div className="max-w-7xl mx-auto px-4">
 
           {/* Desktop nav */}
