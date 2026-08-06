@@ -10,8 +10,8 @@ interface UserAvatarProps {
   className?: string;
 }
 
-export const UserAvatar = ({ firstName, lastName, imageUrl, status, size = 'md', className }: UserAvatarProps) => {
-  const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+export const UserAvatar = ({ firstName = '', lastName = '', imageUrl, status, size = 'md', className }: UserAvatarProps) => {
+  const initials = `${firstName?.charAt(0) || 'U'}${lastName?.charAt(0) || 'U'}`.toUpperCase();
 
   const sizeClasses = {
     sm: 'w-8 h-8 text-xs',

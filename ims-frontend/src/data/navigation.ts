@@ -13,7 +13,19 @@ import {
   Bell, 
   LineChart, 
   Globe, 
-  Settings 
+  Settings,
+  TrendingUp,
+  CalendarClock,
+  Activity,
+  Award,
+  Bookmark,
+  Layers,
+  Building,
+  HardDrive,
+  FolderOpen,
+  UploadCloud,
+  MessageSquare,
+  Megaphone
 } from 'lucide-react';
 
 export interface NavItem {
@@ -48,6 +60,7 @@ export const SIDEBAR_NAVIGATION: NavGroup[] = [
         href: '/dashboard/innovations',
         icon: Lightbulb,
         subItems: [
+          { name: 'Categories', href: '/dashboard/innovations/categories' },
           { name: 'My Submissions', href: '/dashboard/innovations/my' },
           { name: 'All Innovations', href: '/dashboard/innovations/all' },
         ]
@@ -66,27 +79,253 @@ export const SIDEBAR_NAVIGATION: NavGroup[] = [
     ]
   },
   {
-    name: 'PROGRAMS',
+    name: 'STARTUPS',
     items: [
       {
-        name: 'Startups',
+        name: 'Startup Dashboard',
+        href: '/dashboard/startups/dashboard',
+        icon: Building2,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'CENTRAL_HUB_MANAGER', 'SCHOOL_HUB_MANAGER'],
+      },
+      {
+        name: 'Startup Directory',
         href: '/dashboard/startups',
+        icon: Users,
+      },
+      {
+        name: 'My Startups',
+        href: '/dashboard/startups/my',
         icon: Rocket,
       },
       {
-        name: 'Mentorship',
-        href: '/dashboard/mentorship',
+        name: 'Analytics',
+        href: '/dashboard/startups/analytics',
+        icon: TrendingUp,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR'],
+      }
+    ]
+  },
+  {
+    name: 'MENTORSHIP',
+    items: [
+      {
+        name: 'Mentorship Hub',
+        href: '/dashboard/mentorship/dashboard',
+        icon: Briefcase,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR'],
+      },
+      {
+        name: 'Mentor Directory',
+        href: '/dashboard/mentorship/mentors',
+        icon: Users,
+      },
+      {
+        name: 'Session Calendar',
+        href: '/dashboard/mentorship/calendar',
+        icon: CalendarClock,
+      },
+      {
+        name: 'Mentoring Sessions',
+        href: '/dashboard/mentorship/sessions',
         icon: UserPlus,
       },
       {
-        name: 'Funding',
-        href: '/dashboard/funding',
-        icon: Banknote,
+        name: 'Action Plans',
+        href: '/dashboard/mentorship/action-plans',
+        icon: ClipboardCheck,
       },
       {
-        name: 'Competitions',
-        href: '/dashboard/competitions',
+        name: 'Analytics',
+        href: '/dashboard/mentorship/analytics',
+        icon: TrendingUp,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR'],
+      }
+    ]
+  },
+  {
+    name: 'FUNDING & GRANTS',
+    items: [
+      {
+        name: 'Funding Dashboard',
+        href: '/dashboard/funding/dashboard',
+        icon: Banknote,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR'],
+      },
+      {
+        name: 'Funding Programs',
+        href: '/dashboard/funding/programs',
+        icon: Briefcase,
+      },
+      {
+        name: 'Applications',
+        href: '/dashboard/funding/applications',
+        icon: FileText,
+      },
+      {
+        name: 'Disbursements',
+        href: '/dashboard/funding/disbursements',
+        icon: Activity,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR'],
+      },
+      {
+        name: 'Analytics',
+        href: '/dashboard/funding/analytics',
+        icon: TrendingUp,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR'],
+      }
+    ]
+  },
+  {
+    name: 'COMPETITIONS & EVENTS',
+    items: [
+      {
+        name: 'Dashboard',
+        href: '/dashboard/competitions/dashboard',
         icon: Trophy,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'HUB_MANAGER']
+      },
+      {
+        name: 'All Competitions',
+        href: '/dashboard/competitions/list',
+        icon: FileText,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'HUB_MANAGER']
+      },
+      {
+        name: 'Participants',
+        href: '/dashboard/competitions/participants',
+        icon: Users,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'HUB_MANAGER', 'ACADEMIC_STAFF']
+      },
+      {
+        name: 'Judges & Scoring',
+        href: '/dashboard/competitions/judges',
+        icon: ClipboardCheck,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'HUB_MANAGER']
+      },
+      {
+        name: 'Pitch Schedule',
+        href: '/dashboard/competitions/pitch',
+        icon: CalendarClock,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'HUB_MANAGER', 'ACADEMIC_STAFF']
+      },
+      {
+        name: 'Results & Winners',
+        href: '/dashboard/competitions/results',
+        icon: Award,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'HUB_MANAGER', 'ACADEMIC_STAFF', 'STUDENT']
+      },
+      {
+        name: 'Event Analytics',
+        href: '/dashboard/competitions/analytics',
+        icon: LineChart,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'HUB_MANAGER']
+      }
+    ]
+  },
+  {
+    name: 'OPPORTUNITIES',
+    items: [
+      {
+        name: 'Dashboard',
+        href: '/dashboard/opportunities/dashboard',
+        icon: Activity,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'STUDENT']
+      },
+      {
+        name: 'Marketplace',
+        href: '/dashboard/opportunities/marketplace',
+        icon: Briefcase,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'STUDENT', 'ALUMNI']
+      },
+      {
+        name: 'My Applications',
+        href: '/dashboard/opportunities/applications',
+        icon: FileText,
+        roles: ['STUDENT', 'ALUMNI']
+      },
+      {
+        name: 'Saved',
+        href: '/dashboard/opportunities/saved',
+        icon: Bookmark,
+        roles: ['STUDENT', 'ALUMNI']
+      },
+      {
+        name: 'Categories',
+        href: '/dashboard/opportunities/categories',
+        icon: Layers,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'STUDENT']
+      },
+      {
+        name: 'Providers',
+        href: '/dashboard/opportunities/providers',
+        icon: Building,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'STUDENT']
+      },
+      {
+        name: 'Reports & Analytics',
+        href: '/dashboard/opportunities/reports',
+        icon: LineChart,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR']
+      }
+    ]
+  },
+  {
+    name: 'DOCUMENTS',
+    items: [
+      {
+        name: 'Workspace',
+        href: '/dashboard/documents/dashboard',
+        icon: HardDrive,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'HUB_MANAGER', 'ACADEMIC_STAFF', 'STUDENT']
+      },
+      {
+        name: 'Library',
+        href: '/dashboard/documents/library',
+        icon: FolderOpen,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'HUB_MANAGER', 'ACADEMIC_STAFF', 'STUDENT']
+      },
+      {
+        name: 'Upload',
+        href: '/dashboard/documents/upload',
+        icon: UploadCloud,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'HUB_MANAGER', 'ACADEMIC_STAFF']
+      },
+      {
+        name: 'Categories',
+        href: '/dashboard/documents/categories',
+        icon: Layers,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'HUB_MANAGER']
+      },
+      {
+        name: 'Reports & Analytics',
+        href: '/dashboard/documents/reports',
+        icon: LineChart,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR']
+      }
+    ]
+  },
+  {
+    name: 'COMMUNICATION',
+    items: [
+      {
+        name: 'Dashboard',
+        href: '/dashboard/notifications/dashboard',
+        icon: LayoutDashboard,
+      },
+      {
+        name: 'Messages',
+        href: '/dashboard/messages',
+        icon: MessageSquare,
+      },
+      {
+        name: 'Notifications',
+        href: '/dashboard/notifications/center',
+        icon: Bell,
+      },
+      {
+        name: 'Announcements',
+        href: '/dashboard/announcements',
+        icon: Megaphone,
       }
     ]
   },
@@ -125,11 +364,6 @@ export const SIDEBAR_NAVIGATION: NavGroup[] = [
           { name: 'All Users', href: '/dashboard/users' },
           { name: 'Roles & Permissions', href: '/dashboard/roles' },
         ]
-      },
-      {
-        name: 'Documents',
-        href: '/dashboard/documents',
-        icon: FileText,
       },
       {
         name: 'Notifications',

@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ROUTES } from '@/constants/routes';
 
 // Layouts
@@ -58,6 +58,84 @@ import { InnovationList } from '@/pages/dashboard/innovations/InnovationList';
 import { InnovationDetails } from '@/pages/dashboard/innovations/InnovationDetails';
 import { SubmitInnovation } from '@/pages/dashboard/innovations/SubmitInnovation';
 import { Categories } from '@/pages/dashboard/innovations/Categories';
+
+// Review Pages
+import { ReviewDashboard } from '@/pages/dashboard/reviews/ReviewDashboard';
+import { AssignedReviews } from '@/pages/dashboard/reviews/AssignedReviews';
+import { ReviewDetails } from '@/pages/dashboard/reviews/ReviewDetails';
+import { InnovationEvaluation } from '@/pages/dashboard/reviews/InnovationEvaluation';
+import { ReviewerProfile } from '@/pages/dashboard/reviews/ReviewerProfile';
+import { ReviewAnalytics } from '@/pages/dashboard/reviews/ReviewAnalytics';
+
+import { StartupDashboard } from '@/pages/dashboard/startups/StartupDashboard';
+import { StartupList } from '@/pages/dashboard/startups/StartupList';
+import { StartupProfile } from '@/pages/dashboard/startups/StartupProfile';
+import { CreateStartup } from '@/pages/dashboard/startups/CreateStartup';
+import { StartupAnalytics } from '@/pages/dashboard/startups/StartupAnalytics';
+
+import { MentorshipDashboard } from '@/pages/dashboard/mentorship/MentorshipDashboard';
+import { MentorDirectory } from '@/pages/dashboard/mentorship/MentorDirectory';
+import { MentorProfile } from '@/pages/dashboard/mentorship/MentorProfile';
+import { SessionCalendar } from '@/pages/dashboard/mentorship/SessionCalendar';
+import { MentoringSessions } from '@/pages/dashboard/mentorship/MentoringSessions';
+import { SessionDetails } from '@/pages/dashboard/mentorship/SessionDetails';
+import { ActionPlans } from '@/pages/dashboard/mentorship/ActionPlans';
+import { MentorshipAnalytics } from '@/pages/dashboard/mentorship/MentorshipAnalytics';
+
+import { FundingDashboard } from '@/pages/dashboard/funding/FundingDashboard';
+import { FundingPrograms } from '@/pages/dashboard/funding/FundingPrograms';
+import { ProgramDetails } from '@/pages/dashboard/funding/ProgramDetails';
+import { ApplyFunding } from '@/pages/dashboard/funding/ApplyFunding';
+import { FundingApplications } from '@/pages/dashboard/funding/FundingApplications';
+import { ApplicationDetails } from '@/pages/dashboard/funding/ApplicationDetails';
+import { ApplicationEvaluation } from '@/pages/dashboard/funding/ApplicationEvaluation';
+import { FundingDisbursements } from '@/pages/dashboard/funding/FundingDisbursements';
+import { DisbursementDetails } from '@/pages/dashboard/funding/DisbursementDetails';
+import { FundingAnalytics } from '@/pages/dashboard/funding/FundingAnalytics';
+
+import { CompetitionDashboard } from '@/pages/dashboard/competitions/CompetitionDashboard';
+import { CompetitionList } from '@/pages/dashboard/competitions/CompetitionList';
+import { CreateCompetition } from '@/pages/dashboard/competitions/CreateCompetition';
+import { CompetitionDetails } from '@/pages/dashboard/competitions/CompetitionDetails';
+import { CompetitionParticipants } from '@/pages/dashboard/competitions/CompetitionParticipants';
+import { CompetitionJudges } from '@/pages/dashboard/competitions/CompetitionJudges';
+import { PitchingSchedule } from '@/pages/dashboard/competitions/PitchingSchedule';
+import { CompetitionResults } from '@/pages/dashboard/competitions/CompetitionResults';
+import { CompetitionAnalytics } from '@/pages/dashboard/competitions/CompetitionAnalytics';
+import { CompetitionRegistration } from '@/pages/dashboard/competitions/CompetitionRegistration';
+import { JudgeAssignment } from '@/pages/dashboard/competitions/JudgeAssignment';
+import { CompetitionEvaluation } from '@/pages/dashboard/competitions/CompetitionEvaluation';
+
+// Opportunity Management
+import { OpportunityDashboard } from '@/pages/dashboard/opportunities/OpportunityDashboard';
+import { OpportunityMarketplace } from '@/pages/dashboard/opportunities/OpportunityMarketplace';
+import { OpportunityDetails } from '@/pages/dashboard/opportunities/OpportunityDetails';
+import { CreateOpportunity } from '@/pages/dashboard/opportunities/CreateOpportunity';
+import { SavedOpportunities } from '@/pages/dashboard/opportunities/SavedOpportunities';
+import { MyApplications } from '@/pages/dashboard/opportunities/MyApplications';
+import { ApplicationDetails as OpportunityAppDetails } from '@/pages/dashboard/opportunities/ApplicationDetails';
+import { OpportunityCategories } from '@/pages/dashboard/opportunities/OpportunityCategories';
+import { OpportunityProviders } from '@/pages/dashboard/opportunities/OpportunityProviders';
+import { OpportunityReports } from '@/pages/dashboard/opportunities/OpportunityReports';
+import { OpportunityAnalytics } from '@/pages/dashboard/opportunities/OpportunityAnalytics';
+
+// Document Management
+import { DocumentDashboard } from '@/pages/dashboard/documents/DocumentDashboard';
+import { DocumentLibrary } from '@/pages/dashboard/documents/DocumentLibrary';
+import { UploadDocuments } from '@/pages/dashboard/documents/UploadDocuments';
+import { DocumentDetails } from '@/pages/dashboard/documents/DocumentDetails';
+import { DocumentCategories } from '@/pages/dashboard/documents/DocumentCategories';
+import { DocumentReports } from '@/pages/dashboard/documents/DocumentReports';
+import { DocumentAnalytics } from '@/pages/dashboard/documents/DocumentAnalytics';
+
+// Messaging & Notifications
+import { NotificationDashboard } from '@/pages/dashboard/messaging/NotificationDashboard';
+import { NotificationCenter } from '@/pages/dashboard/messaging/NotificationCenter';
+import { Messages } from '@/pages/dashboard/messaging/Messages';
+import { Announcements } from '@/pages/dashboard/messaging/Announcements';
+import { CreateAnnouncement } from '@/pages/dashboard/messaging/CreateAnnouncement';
+import { NotificationPreferences } from '@/pages/dashboard/messaging/NotificationPreferences';
+import { MessagingAnalytics } from '@/pages/dashboard/messaging/MessagingAnalytics';
 
 export const AppRouter = () => {
   return (
@@ -121,14 +199,94 @@ export const AppRouter = () => {
           <Route path="/dashboard/innovations/:id" element={<InnovationDetails />} />
           <Route path="/dashboard/innovations/categories" element={<Categories />} />
           
+          {/* Review Module */}
+          <Route path="/dashboard/reviews/dashboard" element={<ReviewDashboard />} />
+          <Route path="/dashboard/reviews" element={<AssignedReviews />} />
+          <Route path="/dashboard/reviews/analytics" element={<ReviewAnalytics />} />
+          <Route path="/dashboard/reviews/:id" element={<ReviewDetails />} />
+          <Route path="/dashboard/reviews/:id/evaluate" element={<InnovationEvaluation />} />
+          <Route path="/dashboard/reviewers" element={<ReviewerProfile />} />
+          
           <Route path="/dashboard/analytics" element={<div className="p-6 font-bold">Analytics Module Placeholder</div>} />
-          <Route path="/dashboard/reviews" element={<div className="p-6 font-bold">Reviews Module Placeholder</div>} />
-          <Route path="/dashboard/startups" element={<div className="p-6 font-bold">Startups Module Placeholder</div>} />
-          <Route path="/dashboard/mentorship" element={<div className="p-6 font-bold">Mentorship Module Placeholder</div>} />
-          <Route path="/dashboard/funding" element={<div className="p-6 font-bold">Funding Module Placeholder</div>} />
-          <Route path="/dashboard/competitions" element={<div className="p-6 font-bold">Competitions Module Placeholder</div>} />
-          <Route path="/dashboard/opportunities" element={<div className="p-6 font-bold">Opportunities Module Placeholder</div>} />
-          <Route path="/dashboard/documents" element={<div className="p-6 font-bold">Documents Module Placeholder</div>} />
+          
+          {/* Startup Module */}
+          <Route path="/dashboard/startups/dashboard" element={<StartupDashboard />} />
+          <Route path="/dashboard/startups" element={<StartupList />} />
+          <Route path="/dashboard/startups/analytics" element={<StartupAnalytics />} />
+          <Route path="/dashboard/startups/new" element={<CreateStartup />} />
+          <Route path="/dashboard/startups/:id" element={<StartupProfile />} />
+          
+          {/* Mentorship Module */}
+          <Route path="/dashboard/mentorship/dashboard" element={<MentorshipDashboard />} />
+          <Route path="/dashboard/mentorship/mentors" element={<MentorDirectory />} />
+          <Route path="/dashboard/mentors/:id" element={<MentorProfile />} />
+          <Route path="/dashboard/mentorship/calendar" element={<SessionCalendar />} />
+          <Route path="/dashboard/mentorship/sessions" element={<MentoringSessions />} />
+          <Route path="/dashboard/mentorship/sessions/:id" element={<SessionDetails />} />
+          <Route path="/dashboard/mentorship/action-plans" element={<ActionPlans />} />
+          <Route path="/dashboard/mentorship/analytics" element={<MentorshipAnalytics />} />
+          
+          {/* Funding Module */}
+          <Route path="/dashboard/funding/dashboard" element={<FundingDashboard />} />
+          <Route path="/dashboard/funding/programs" element={<FundingPrograms />} />
+          <Route path="/dashboard/funding/programs/:id" element={<ProgramDetails />} />
+          <Route path="/dashboard/funding/apply" element={<ApplyFunding />} />
+          <Route path="/dashboard/funding/applications" element={<FundingApplications />} />
+          <Route path="/dashboard/funding/applications/:id" element={<ApplicationDetails />} />
+          <Route path="/dashboard/funding/applications/:id/evaluate" element={<ApplicationEvaluation />} />
+          <Route path="/dashboard/funding/disbursements" element={<FundingDisbursements />} />
+          <Route path="/dashboard/funding/disbursements/:id" element={<DisbursementDetails />} />
+          <Route path="/dashboard/funding/analytics" element={<FundingAnalytics />} />
+          
+          {/* Competitions Module */}
+          <Route path="/dashboard/competitions/dashboard" element={<CompetitionDashboard />} />
+          <Route path="/dashboard/competitions/list" element={<CompetitionList />} />
+          <Route path="/dashboard/competitions/new" element={<CreateCompetition />} />
+          <Route path="/dashboard/competitions/participants" element={<CompetitionParticipants />} />
+          <Route path="/dashboard/competitions/judges" element={<CompetitionJudges />} />
+          <Route path="/dashboard/competitions/pitch" element={<PitchingSchedule />} />
+          <Route path="/dashboard/competitions/results" element={<CompetitionResults />} />
+          <Route path="/dashboard/competitions/analytics" element={<CompetitionAnalytics />} />
+          <Route path="/dashboard/competitions/evaluate/:sessionId/:participantId" element={<CompetitionEvaluation />} />
+          <Route path="/dashboard/competitions/:id" element={<CompetitionDetails />} />
+          <Route path="/dashboard/competitions/:id/register" element={<CompetitionRegistration />} />
+          <Route path="/dashboard/competitions/:id/assign-judges" element={<JudgeAssignment />} />
+          
+          {/* Opportunity Management */}
+          <Route path="/dashboard/opportunities/dashboard" element={<OpportunityDashboard />} />
+          <Route path="/dashboard/opportunities/marketplace" element={<OpportunityMarketplace />} />
+          <Route path="/dashboard/opportunities/new" element={<CreateOpportunity />} />
+          <Route path="/dashboard/opportunities/saved" element={<SavedOpportunities />} />
+          <Route path="/dashboard/opportunities/applications" element={<MyApplications />} />
+          <Route path="/dashboard/opportunities/applications/:id" element={<OpportunityAppDetails />} />
+          <Route path="/dashboard/opportunities/categories" element={<OpportunityCategories />} />
+          <Route path="/dashboard/opportunities/providers" element={<OpportunityProviders />} />
+          <Route path="/dashboard/opportunities/providers/:id" element={<OpportunityProviders />} />
+          <Route path="/dashboard/opportunities/reports" element={<OpportunityReports />} />
+          <Route path="/dashboard/opportunities/analytics" element={<OpportunityAnalytics />} />
+          <Route path="/dashboard/opportunities/:id" element={<OpportunityDetails />} />
+          
+          {/* Document Management */}
+          <Route path="/dashboard/documents" element={<Navigate to="/dashboard/documents/dashboard" replace />} />
+          <Route path="/dashboard/documents/dashboard" element={<DocumentDashboard />} />
+          <Route path="/dashboard/documents/library" element={<DocumentLibrary />} />
+          <Route path="/dashboard/documents/upload" element={<UploadDocuments />} />
+          <Route path="/dashboard/documents/categories" element={<DocumentCategories />} />
+          <Route path="/dashboard/documents/reports" element={<DocumentReports />} />
+          <Route path="/dashboard/documents/analytics" element={<DocumentAnalytics />} />
+          <Route path="/dashboard/documents/:id/preview" element={<DocumentDetails />} />
+          <Route path="/dashboard/documents/:id/versions" element={<DocumentDetails />} />
+          <Route path="/dashboard/documents/:id" element={<DocumentDetails />} />
+          
+          {/* Messaging & Notifications */}
+          <Route path="/dashboard/notifications/dashboard" element={<NotificationDashboard />} />
+          <Route path="/dashboard/notifications/center" element={<NotificationCenter />} />
+          <Route path="/dashboard/messages" element={<Messages />} />
+          <Route path="/dashboard/announcements" element={<Announcements />} />
+          <Route path="/dashboard/announcements/new" element={<CreateAnnouncement />} />
+          <Route path="/dashboard/preferences/notifications" element={<NotificationPreferences />} />
+          <Route path="/dashboard/messages/analytics" element={<MessagingAnalytics />} />
+          
           <Route path="/dashboard/showcase" element={<div className="p-6 font-bold">Showcase Management Placeholder</div>} />
         </Route>
       </Route>
