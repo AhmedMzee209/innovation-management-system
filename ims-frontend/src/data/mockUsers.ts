@@ -22,14 +22,14 @@ const FIRST_NAMES = ['Ahmed', 'Fatma', 'Ali', 'Asha', 'Juma', 'Maryam', 'Khamis'
 const LAST_NAMES = ['Mzee', 'Salum', 'Abdullah', 'Juma', 'Khamis', 'Haji', 'Ali', 'Makame', 'Said', 'Suleiman'];
 const SCHOOLS = ['School of Computing', 'School of Business', 'School of Education', 'School of Health', 'School of Agriculture'];
 const HUBS = ['Central Hub', 'Tech Hub', 'Business Hub', 'Agri Hub'];
-const ROLES = ['ROLE_SUPER_ADMIN', 'ROLE_INNOVATION_DIRECTOR', 'ROLE_CENTRAL_HUB_MANAGER', 'ROLE_SCHOOL_HUB_MANAGER', 'ROLE_MENTOR', 'ROLE_REVIEWER', 'ROLE_STUDENT', 'ROLE_ALUMNI'];
+const ROLES = ['ROLE_SUPER_ADMIN', 'ROLE_INNOVATION_DIRECTOR', 'ROLE_CENTRAL_HUB_MANAGER', 'ROLE_SCHOOL_HUB_MANAGER', 'ROLE_MENTOR', 'ROLE_REVIEWER', 'ROLE_INNOVATOR', 'ROLE_INNOVATOR'];
 
 // Generate 50 mock users dynamically to avoid massive hardcoding, but deterministic.
 export const MOCK_USERS: User[] = Array.from({ length: 50 }).map((_, i) => {
   const firstName = FIRST_NAMES[i % FIRST_NAMES.length];
   const lastName = LAST_NAMES[i % LAST_NAMES.length];
   
-  let role = 'ROLE_STUDENT';
+  let role = 'ROLE_INNOVATOR';
   if (i === 0) role = 'ROLE_SUPER_ADMIN';
   else if (i === 1) role = 'ROLE_INNOVATION_DIRECTOR';
   else if (i < 5) role = 'ROLE_CENTRAL_HUB_MANAGER';

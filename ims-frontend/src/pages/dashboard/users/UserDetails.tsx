@@ -104,7 +104,7 @@ export const UserDetails = () => {
                     <h4 className="font-bold text-gray-900 dark:text-white text-sm">Role Updated</h4>
                     <time className="text-xs font-medium text-[#0098c8]">Today, 10:24 AM</time>
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">User role was updated from Student to Reviewer by Super Admin.</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">User role was updated from Innovator to Reviewer by Super Admin.</p>
                 </div>
               </div>
 

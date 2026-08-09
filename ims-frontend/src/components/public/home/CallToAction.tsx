@@ -21,7 +21,7 @@ export const CallToAction = () => {
               Ready to Shape the Future of Innovation?
             </h2>
             <p className="text-blue-100 text-base mb-10 max-w-2xl mx-auto">
-              Join the SUZA Innovation Management System today and turn your groundbreaking ideas into reality. Open to all students, researchers, and faculty.
+              Join the SUZA Innovation Management System today and turn your groundbreaking ideas into reality. Open to all innovators, researchers, and faculty.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
               <Link

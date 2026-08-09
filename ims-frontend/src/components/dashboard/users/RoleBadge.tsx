@@ -20,10 +20,10 @@ export const RoleBadge = ({ roleId, className }: RoleBadgeProps) => {
         return { label: 'Mentor', color: 'bg-teal-100 text-teal-700 dark:bg-teal-500/10 dark:text-teal-400 border-teal-200 dark:border-teal-800', icon: Briefcase };
       case 'ROLE_REVIEWER':
         return { label: 'Reviewer', color: 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400 border-orange-200 dark:border-orange-800', icon: BookOpen };
-      case 'ROLE_STUDENT':
-        return { label: 'Student', color: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700', icon: GraduationCap };
-      case 'ROLE_ALUMNI':
-        return { label: 'Alumni', color: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700', icon: GraduationCap };
+      case 'ROLE_INNOVATOR':
+        return { label: 'Innovator', color: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700', icon: GraduationCap };
+      case 'ROLE_INNOVATOR':
+        return { label: 'Innovator', color: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700', icon: GraduationCap };
       case 'ROLE_INVESTOR':
         return { label: 'Investor', color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800', icon: Briefcase };
       case 'ROLE_PUBLIC_VISITOR':

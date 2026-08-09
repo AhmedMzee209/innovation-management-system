@@ -70,7 +70,7 @@ export const CreateAnnouncement = () => {
                   className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-[#0098c8] outline-none transition-all dark:text-white"
                 >
                   <option value="All Users">All Users (University-wide)</option>
-                  <option value="Students">Students Only</option>
+                  <option value="Innovators">Innovators Only</option>
                   <option value="Academic Staff">Academic Staff Only</option>
                   <option value="Hub Managers">Hub Managers Only</option>
                 </select>

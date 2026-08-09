@@ -102,7 +102,7 @@ export const EditUser = () => {
                 <div>
                   <select defaultValue={user.role} className="w-full max-w-md px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] bg-white dark:bg-gray-900 dark:text-white">
                     <option value="ROLE_SUPER_ADMIN">Super Admin</option>
-                    <option value="ROLE_STUDENT">Student</option>
+                    <option value="ROLE_INNOVATOR">Innovator</option>
                     <option value="ROLE_INNOVATION_DIRECTOR">Innovation Director</option>
                     <option value="ROLE_REVIEWER">Reviewer</option>
                   </select>

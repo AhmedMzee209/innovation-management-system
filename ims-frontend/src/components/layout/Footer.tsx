@@ -8,7 +8,7 @@ const usefulLinks = [
 ];
 
 const quickLinks = [
-  'Student Portal', 'Staff Email', 'e-Library', 'Research Repository',
+  'Innovator Portal', 'Staff Email', 'e-Library', 'Research Repository',
   'Innovation Portal', 'Career Center',
 ];
 

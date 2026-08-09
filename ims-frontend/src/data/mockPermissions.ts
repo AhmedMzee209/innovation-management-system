@@ -48,8 +48,8 @@ export const MOCK_ROLE_PERMISSIONS: Record<string, RolePermissions> = {
       return createFullAccess(module);
     }),
   },
-  'ROLE_STUDENT': {
-    roleId: 'ROLE_STUDENT',
+  'ROLE_INNOVATOR': {
+    roleId: 'ROLE_INNOVATOR',
     permissions: PERMISSION_MODULES.map(module => {
       if (module === 'Innovations' || module === 'Startups') {
         return {

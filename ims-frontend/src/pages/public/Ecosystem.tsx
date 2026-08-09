@@ -11,7 +11,7 @@ export const Ecosystem = () => {
         >
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">Innovation Ecosystem</h1>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Connect with students, researchers, mentors, and investors in our vibrant ecosystem.
+            Connect with innovators, researchers, mentors, and investors in our vibrant ecosystem.
           </p>
         </motion.div>
         {/* Placeholder for more content */}

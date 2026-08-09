@@ -93,7 +93,7 @@ export const MOCK_INNOVATIONS: Innovation[] = Array.from({ length: 120 }).map((_
   const school = sample(MOCK_SCHOOLS);
   const hub = sample(MOCK_HUBS);
   const manager = MOCK_MANAGERS.find(m => m.hubId === hub.id) || MOCK_MANAGERS[0];
-  const owner = sample(Object.values(MOCK_USERS).filter(u => u.role === 'ROLE_STUDENT' || u.role === 'ROLE_RESEARCHER'));
+  const owner = sample(Object.values(MOCK_USERS).filter(u => u.role === 'ROLE_INNOVATOR' || u.role === 'ROLE_RESEARCHER'));
   
   const category = sample(INNOVATION_CATEGORIES).id as InnovationCategory;
   const stage = STAGES[randomInt(0, 6)]; // Exclude rejected for mostly positive data

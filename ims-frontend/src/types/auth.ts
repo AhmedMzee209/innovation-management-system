@@ -5,8 +5,8 @@ export type Role =
   | 'SCHOOL_HUB_MANAGER'
   | 'MENTOR'
   | 'REVIEWER'
-  | 'STUDENT'
-  | 'ALUMNI';
+  | 'INNOVATOR'
+  | 'INNOVATOR';
 
 export interface UserProfile {
   id: string;

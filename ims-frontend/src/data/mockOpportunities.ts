@@ -121,7 +121,7 @@ export const MOCK_OPPORTUNITIES: Opportunity[] = Array.from({ length: 150 }).map
     bannerColor: sample(BANNERS),
     
     eligibleSchools: ['School of Computing', 'School of Business', 'All'],
-    eligibleRoles: ['ROLE_STUDENT', 'ROLE_ALUMNI', 'ROLE_INNOVATOR'],
+    eligibleRoles: ['ROLE_INNOVATOR', 'ROLE_INNOVATOR', 'ROLE_INNOVATOR'],
     requiredSkills: [sample(SKILLS), sample(SKILLS)],
     educationLevel: sample([['Undergraduate', 'Graduate'], ['PhD'], ['Any']]),
     experience: sample(['Entry Level', '1-3 Years', 'No experience required']),
@@ -132,7 +132,7 @@ export const MOCK_OPPORTUNITIES: Opportunity[] = Array.from({ length: 150 }).map
 });
 
 const activeOpps = MOCK_OPPORTUNITIES.filter(o => o.status === 'Published');
-const studentUsers = MOCK_USERS.filter(u => u.role === 'ROLE_STUDENT');
+const innovatorUsers = MOCK_USERS.filter(u => u.role === 'ROLE_INNOVATOR');
 
 export const MOCK_APPLICATIONS: OpportunityApplication[] = Array.from({ length: 300 }).map((_, i) => {
   const statusRoll = Math.random();
@@ -146,7 +146,7 @@ export const MOCK_APPLICATIONS: OpportunityApplication[] = Array.from({ length: 
   return {
     id: `app_${i + 1}`,
     opportunityId: sample(MOCK_OPPORTUNITIES).id,
-    applicantId: sample(studentUsers).id, // We'll mix startups and users in a real app
+    applicantId: sample(innovatorUsers).id, // We'll mix startups and users in a real app
     applicantType: 'User',
     status,
     appliedDate: generateDate(-randomInt(5, 30)),

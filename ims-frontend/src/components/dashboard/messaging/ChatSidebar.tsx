@@ -2,7 +2,8 @@ import { Search, Pin, MessageSquare, Plus } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { setSearchQuery, setActiveConversation, toggleSidebar } from '@/store/slices/messageSlice';
-import { MOCK_CONVERSATIONS, MOCK_MESSAGES, MOCK_USERS } from '@/data/mockMessaging';
+import { MOCK_CONVERSATIONS, MOCK_MESSAGES } from '@/data/mockMessaging';
+import { MOCK_USERS } from '@/data/mockUsers';
 import { format, formatDistanceToNow, isToday } from 'date-fns';
 import { cn } from '@/lib/utils';
 

@@ -39,13 +39,13 @@ export const EVENTS = [
 ];
 
 export const TESTIMONIALS = [
-  { id: '1', quote: "IMS transformed my final year project into a funded startup. The mentorship was invaluable.", author: "Asha M.", role: "Student Innovator", avatar: "https://i.pravatar.cc/150?u=asha" },
+  { id: '1', quote: "IMS transformed my final year project into a funded startup. The mentorship was invaluable.", author: "Asha M.", role: "Innovator Innovator", avatar: "https://i.pravatar.cc/150?u=asha" },
   { id: '2', quote: "A seamless platform that bridges the gap between academic research and commercial viability.", author: "Dr. K. Omar", role: "Innovation Manager", avatar: "https://i.pravatar.cc/150?u=omar" },
   { id: '3', quote: "We've found incredible talent and viable businesses through SUZA's innovation ecosystem.", author: "John D.", role: "Angel Investor", avatar: "https://i.pravatar.cc/150?u=john" },
 ];
 
 export const FAQS = [
-  { question: 'Who can submit an innovation?', answer: 'Any currently enrolled SUZA student or active faculty member can submit an innovation through the IMS platform.' },
-  { question: 'How is intellectual property handled?', answer: 'IP rights are governed by the SUZA Innovation Policy. Generally, students retain ownership while the university retains a non-exclusive license for academic purposes.' },
+  { question: 'Who can submit an innovation?', answer: 'Any currently enrolled SUZA innovator or active faculty member can submit an innovation through the IMS platform.' },
+  { question: 'How is intellectual property handled?', answer: 'IP rights are governed by the SUZA Innovation Policy. Generally, innovators retain ownership while the university retains a non-exclusive license for academic purposes.' },
   { question: 'What kind of funding is available?', answer: 'We offer prototype grants, seed funding for incubated startups, and connections to external angel investors and venture capital.' },
 ];

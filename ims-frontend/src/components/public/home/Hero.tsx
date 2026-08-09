@@ -41,7 +41,7 @@ const announcements = [
   {
     id: 3,
     badge: 'NEW',
-    title: 'CAS Student Innovation Results',
+    title: 'CAS Innovator Innovation Results',
     description: 'Open to view the approved innovations from the latest review cycle.',
     action: 'View Results',
   },

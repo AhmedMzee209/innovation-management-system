@@ -56,7 +56,7 @@ export const DashboardHome = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   
   // Basic RBAC demonstration for the dashboard widgets
-  const isStudent = user?.role === 'ROLE_STUDENT';
+  const isInnovator = user?.role === 'ROLE_INNOVATOR';
   const isReviewer = user?.role === 'ROLE_REVIEWER';
 
   return (
@@ -68,7 +68,7 @@ export const DashboardHome = () => {
             Welcome back, {user?.firstName || 'User'}! 👋
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {isStudent 
+            {isInnovator 
               ? "Here's the status of your current innovation submissions." 
               : isReviewer 
                 ? "You have pending innovations waiting for your review."
@@ -84,11 +84,11 @@ export const DashboardHome = () => {
 
       {/* Stats Row - Conditionally rendered based on role */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {!isStudent && !isReviewer && MOCK_DASHBOARD_STATS.map((stat) => (
+        {!isInnovator && !isReviewer && MOCK_DASHBOARD_STATS.map((stat) => (
           <StatCard key={stat.id} {...stat} />
         ))}
 
-        {isStudent && (
+        {isInnovator && (
           <>
             <StatCard id="s1" label="My Submissions" value="3" trend={{ value: 1, isPositive: true }} icon={Rocket} />
             <StatCard id="s2" label="Pending Review" value="1" trend={{ value: 0, isPositive: true }} icon={ClipboardCheck} />
@@ -108,7 +108,7 @@ export const DashboardHome = () => {
       </div>
 
       {/* Charts Row - Only show to admins/managers */}
-      {!isStudent && !isReviewer && (
+      {!isInnovator && !isReviewer && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <ChartCard title="Ecosystem Growth Overview" subtitle="Submissions vs Startups formed over the last 6 months">
@@ -127,7 +127,7 @@ export const DashboardHome = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <DashboardCard 
-            title={isStudent ? "My Recent Submissions" : isReviewer ? "Assigned for Review" : "Recent Submissions"} 
+            title={isInnovator ? "My Recent Submissions" : isReviewer ? "Assigned for Review" : "Recent Submissions"} 
             action={<button className="text-sm font-bold text-[#0098c8]">View All</button>} 
             noPadding
           >

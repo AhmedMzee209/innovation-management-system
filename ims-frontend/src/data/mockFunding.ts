@@ -71,7 +71,7 @@ export const MOCK_FUNDING_PROGRAMS: FundingProgram[] = Array.from({ length: 20 }
     id: `prog_${i + 100}`,
     code: `GRANT-${new Date().getFullYear()}-${String(i + 1).padStart(3, '0')}`,
     name: sample(['Seed Fund Catalyst', 'Research Commercialization Grant', 'Women in Tech Fund', 'Green Energy Initiative', 'DeepTech ScaleUp']),
-    description: 'Providing early-stage capital for university spin-offs and student-led innovations to accelerate go-to-market strategies.',
+    description: 'Providing early-stage capital for university spin-offs and innovator-led innovations to accelerate go-to-market strategies.',
     type: sample(['Grant', 'Grant', 'Grant', 'Equity', 'Convertible Note']),
     category: sample(['Technology', 'Agriculture', 'Healthcare', 'Education', 'General']),
     totalBudget,
@@ -81,7 +81,7 @@ export const MOCK_FUNDING_PROGRAMS: FundingProgram[] = Array.from({ length: 20 }
     startDate: generateDate(isUpcoming ? randomInt(10, 30) : -randomInt(30, 90)),
     endDate: generateDate(isClosed ? -randomInt(1, 30) : randomInt(30, 90)),
     status: isClosed ? 'Closed' : (isUpcoming ? 'Upcoming' : 'Active'),
-    eligibilityCriteria: ['Must be registered SUZA student/alumni', 'TRL 3 or above', 'Clear financial model'],
+    eligibilityCriteria: ['Must be registered SUZA innovator/innovator', 'TRL 3 or above', 'Clear financial model'],
   };
 });
 

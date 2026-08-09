@@ -30,6 +30,15 @@ import documentReducer from './slices/documentSlice';
 import uploadReducer from './slices/uploadSlice';
 import messageReducer from './slices/messageSlice';
 import announcementReducer from './slices/announcementSlice';
+import analyticsReducer from './slices/analyticsSlice';
+import showcaseReducer from './slices/showcaseSlice';
+import systemReducer from './slices/systemSlice';
+import auditReducer from './slices/auditSlice';
+import logReducer from './slices/logSlice';
+import monitoringReducer from './slices/monitoringSlice';
+import backupReducer from './slices/backupSlice';
+import healthReducer from './slices/healthSlice';
+import settingsAdminReducer from './slices/settingsAdminSlice';
 
 export const store = configureStore({
   reducer: {
@@ -63,6 +72,15 @@ export const store = configureStore({
     upload: uploadReducer,
     message: messageReducer,
     announcement: announcementReducer,
+    analytics: analyticsReducer,
+    showcase: showcaseReducer,
+    system: systemReducer,
+    audit: auditReducer,
+    log: logReducer,
+    monitoring: monitoringReducer,
+    backup: backupReducer,
+    health: healthReducer,
+    settingsAdmin: settingsAdminReducer,
   },
 });
 

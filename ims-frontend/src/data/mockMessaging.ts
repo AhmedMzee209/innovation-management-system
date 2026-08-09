@@ -4,7 +4,7 @@ import { MOCK_USERS } from './mockUsers';
 export type Priority = 'Low' | 'Medium' | 'High' | 'Critical';
 export type NotificationCategory = 'System' | 'Mentorship' | 'Funding' | 'Competition' | 'Startup' | 'Review';
 export type AnnouncementCategory = 'General' | 'Event' | 'Funding Opportunity' | 'System Update';
-export type AudienceType = 'All Users' | 'Students' | 'Academic Staff' | 'Hub Managers';
+export type AudienceType = 'All Users' | 'Innovators' | 'Academic Staff' | 'Hub Managers';
 
 export interface Notification {
   id: string;
@@ -148,7 +148,7 @@ export const MOCK_ANNOUNCEMENTS: Announcement[] = Array.from({ length: 50 }).map
   ]),
   content: 'We are excited to announce a new milestone for the university. Please read the full details and ensure that your respective teams are informed. Attachments include the formal memo and schedule.',
   category: sample(['General', 'Event', 'Funding Opportunity', 'System Update']),
-  audience: sample(['All Users', 'Students', 'Academic Staff', 'Hub Managers']),
+  audience: sample(['All Users', 'Innovators', 'Academic Staff', 'Hub Managers']),
   priority: sample(['Low', 'Medium', 'High']),
   authorId: sample(MOCK_USERS).id,
   createdAt: generateDate(-randomInt(0, 60)),

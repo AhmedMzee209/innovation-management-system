@@ -137,6 +137,35 @@ import { CreateAnnouncement } from '@/pages/dashboard/messaging/CreateAnnounceme
 import { NotificationPreferences } from '@/pages/dashboard/messaging/NotificationPreferences';
 import { MessagingAnalytics } from '@/pages/dashboard/messaging/MessagingAnalytics';
 
+// Analytics & Reports
+import { ExecutiveDashboard } from '@/pages/dashboard/analytics/ExecutiveDashboard';
+import { InnovationAnalytics } from '@/pages/dashboard/analytics/InnovationAnalytics';
+import { StartupAnalytics as GlobalStartupAnalytics } from '@/pages/dashboard/analytics/StartupAnalytics';
+import { FundingAnalytics as GlobalFundingAnalytics } from '@/pages/dashboard/analytics/FundingAnalytics';
+import { CompetitionAnalytics as GlobalCompetitionAnalytics } from '@/pages/dashboard/analytics/CompetitionAnalytics';
+import { MentorshipAnalytics as GlobalMentorshipAnalytics } from '@/pages/dashboard/analytics/MentorshipAnalytics';
+import { OpportunityAnalytics as GlobalOpportunityAnalytics } from '@/pages/dashboard/analytics/OpportunityAnalytics';
+import { OrganizationAnalytics } from '@/pages/dashboard/analytics/OrganizationAnalytics';
+import { ReportsCenter } from '@/pages/dashboard/analytics/ReportsCenter';
+import { CustomDashboard } from '@/pages/dashboard/analytics/CustomDashboard';
+
+// Public Showcase
+import { ShowcaseDashboard } from '@/pages/showcase/ShowcaseDashboard';
+import { InnovationGallery } from '@/pages/showcase/InnovationGallery';
+import { InnovationDetail } from '@/pages/showcase/InnovationDetail';
+import { StartupShowcase } from '@/pages/showcase/StartupShowcase';
+import { StartupDetail } from '@/pages/showcase/StartupDetail';
+import { ResearchShowcase } from '@/pages/showcase/ResearchShowcase';
+import { SuccessStories } from '@/pages/showcase/SuccessStories';
+import { AwardsRecognition } from '@/pages/showcase/AwardsRecognition';
+import { InnovationTimeline } from '@/pages/showcase/InnovationTimeline';
+import { EventsGallery } from '@/pages/showcase/EventsGallery';
+import { CompetitionWinners } from '@/pages/showcase/CompetitionWinners';
+import { PartnerOrganizations } from '@/pages/showcase/PartnerOrganizations';
+import { InnovationEcosystem } from '@/pages/showcase/InnovationEcosystem';
+import { PublicSearch } from '@/pages/showcase/PublicSearch';
+import { FeaturedInnovators } from '@/pages/showcase/FeaturedInnovators';
+
 export const AppRouter = () => {
   return (
     <Routes>
@@ -149,7 +178,22 @@ export const AppRouter = () => {
           <Route path="/schools" element={<Schools />} />
           {/* Placeholders for others to prevent 404 while navigating */}
           <Route path="/hubs" element={<div className="pt-24 text-center">Hubs Placeholder</div>} />
-          <Route path="/showcase" element={<div className="pt-24 text-center">Showcase Placeholder</div>} />
+          {/* Showcase routes */}
+          <Route path="/showcase" element={<ShowcaseDashboard />} />
+          <Route path="/showcase/innovations" element={<InnovationGallery />} />
+          <Route path="/showcase/innovations/:id" element={<InnovationDetail />} />
+          <Route path="/showcase/startups" element={<StartupShowcase />} />
+          <Route path="/showcase/startups/:id" element={<StartupDetail />} />
+          <Route path="/showcase/research" element={<ResearchShowcase />} />
+          <Route path="/showcase/success-stories" element={<SuccessStories />} />
+          <Route path="/showcase/awards" element={<AwardsRecognition />} />
+          <Route path="/showcase/timeline" element={<InnovationTimeline />} />
+          <Route path="/showcase/events" element={<EventsGallery />} />
+          <Route path="/showcase/competition-winners" element={<CompetitionWinners />} />
+          <Route path="/showcase/partners" element={<PartnerOrganizations />} />
+          <Route path="/showcase/ecosystem" element={<InnovationEcosystem />} />
+          <Route path="/showcase/search" element={<PublicSearch />} />
+          <Route path="/showcase/innovators" element={<FeaturedInnovators />} />
           <Route path="/events" element={<div className="pt-24 text-center">Events Placeholder</div>} />
           <Route path="/faq" element={<div className="pt-24 text-center">FAQ Placeholder</div>} />
           <Route path="/contact" element={<div className="pt-24 text-center">Contact Placeholder</div>} />
@@ -287,6 +331,18 @@ export const AppRouter = () => {
           <Route path="/dashboard/preferences/notifications" element={<NotificationPreferences />} />
           <Route path="/dashboard/messages/analytics" element={<MessagingAnalytics />} />
           
+          {/* Analytics & Reports */}
+          <Route path="/dashboard/analytics/executive" element={<ExecutiveDashboard />} />
+          <Route path="/dashboard/analytics/innovation" element={<InnovationAnalytics />} />
+          <Route path="/dashboard/analytics/startups" element={<GlobalStartupAnalytics />} />
+          <Route path="/dashboard/analytics/funding" element={<GlobalFundingAnalytics />} />
+          <Route path="/dashboard/analytics/competitions" element={<GlobalCompetitionAnalytics />} />
+          <Route path="/dashboard/analytics/mentorship" element={<GlobalMentorshipAnalytics />} />
+          <Route path="/dashboard/analytics/opportunities" element={<GlobalOpportunityAnalytics />} />
+          <Route path="/dashboard/analytics/organization" element={<OrganizationAnalytics />} />
+          <Route path="/dashboard/analytics/reports" element={<ReportsCenter />} />
+          <Route path="/dashboard/analytics/custom" element={<CustomDashboard />} />
+
           <Route path="/dashboard/showcase" element={<div className="p-6 font-bold">Showcase Management Placeholder</div>} />
         </Route>
       </Route>

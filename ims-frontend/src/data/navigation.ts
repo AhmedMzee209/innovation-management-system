@@ -1,18 +1,18 @@
-import { 
-  LayoutDashboard, 
-  Users, 
-  Building2, 
-  Lightbulb, 
-  ClipboardCheck, 
-  Rocket, 
-  UserPlus, 
-  Banknote, 
-  Trophy, 
-  Briefcase, 
-  FileText, 
-  Bell, 
-  LineChart, 
-  Globe, 
+import {
+  LayoutDashboard,
+  Users,
+  Building2,
+  Lightbulb,
+  ClipboardCheck,
+  Rocket,
+  UserPlus,
+  Banknote,
+  Trophy,
+  Briefcase,
+  FileText,
+  Bell,
+  LineChart,
+  Globe,
   Settings,
   TrendingUp,
   CalendarClock,
@@ -25,7 +25,8 @@ import {
   FolderOpen,
   UploadCloud,
   MessageSquare,
-  Megaphone
+  Megaphone,
+  PieChart as PieChartIcon
 } from 'lucide-react';
 
 export interface NavItem {
@@ -212,7 +213,7 @@ export const SIDEBAR_NAVIGATION: NavGroup[] = [
         name: 'Results & Winners',
         href: '/dashboard/competitions/results',
         icon: Award,
-        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'HUB_MANAGER', 'ACADEMIC_STAFF', 'STUDENT']
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'HUB_MANAGER', 'ACADEMIC_STAFF', 'INNOVATOR']
       },
       {
         name: 'Event Analytics',
@@ -229,37 +230,37 @@ export const SIDEBAR_NAVIGATION: NavGroup[] = [
         name: 'Dashboard',
         href: '/dashboard/opportunities/dashboard',
         icon: Activity,
-        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'STUDENT']
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'INNOVATOR']
       },
       {
         name: 'Marketplace',
         href: '/dashboard/opportunities/marketplace',
         icon: Briefcase,
-        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'STUDENT', 'ALUMNI']
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'INNOVATOR', 'INNOVATOR']
       },
       {
         name: 'My Applications',
         href: '/dashboard/opportunities/applications',
         icon: FileText,
-        roles: ['STUDENT', 'ALUMNI']
+        roles: ['INNOVATOR', 'INNOVATOR']
       },
       {
         name: 'Saved',
         href: '/dashboard/opportunities/saved',
         icon: Bookmark,
-        roles: ['STUDENT', 'ALUMNI']
+        roles: ['INNOVATOR', 'INNOVATOR']
       },
       {
         name: 'Categories',
         href: '/dashboard/opportunities/categories',
         icon: Layers,
-        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'STUDENT']
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'INNOVATOR']
       },
       {
         name: 'Providers',
         href: '/dashboard/opportunities/providers',
         icon: Building,
-        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'STUDENT']
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'INNOVATOR']
       },
       {
         name: 'Reports & Analytics',
@@ -276,13 +277,13 @@ export const SIDEBAR_NAVIGATION: NavGroup[] = [
         name: 'Workspace',
         href: '/dashboard/documents/dashboard',
         icon: HardDrive,
-        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'HUB_MANAGER', 'ACADEMIC_STAFF', 'STUDENT']
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'HUB_MANAGER', 'ACADEMIC_STAFF', 'INNOVATOR']
       },
       {
         name: 'Library',
         href: '/dashboard/documents/library',
         icon: FolderOpen,
-        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'HUB_MANAGER', 'ACADEMIC_STAFF', 'STUDENT']
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR', 'HUB_MANAGER', 'ACADEMIC_STAFF', 'INNOVATOR']
       },
       {
         name: 'Upload',
@@ -301,6 +302,61 @@ export const SIDEBAR_NAVIGATION: NavGroup[] = [
         href: '/dashboard/documents/reports',
         icon: LineChart,
         roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR']
+      }
+    ]
+  },
+  {
+    name: 'ANALYTICS & REPORTS',
+    items: [
+      {
+        name: 'Executive Dashboard',
+        href: '/dashboard/analytics/executive',
+        icon: Activity,
+      },
+      {
+        name: 'Custom Dashboard',
+        href: '/dashboard/analytics/custom',
+        icon: LayoutDashboard,
+      },
+      {
+        name: 'Innovation Analytics',
+        href: '/dashboard/analytics/innovation',
+        icon: Lightbulb,
+      },
+      {
+        name: 'Startup Analytics',
+        href: '/dashboard/analytics/startups',
+        icon: Rocket,
+      },
+      {
+        name: 'Funding Analytics',
+        href: '/dashboard/analytics/funding',
+        icon: Banknote,
+      },
+      {
+        name: 'Competition Analytics',
+        href: '/dashboard/analytics/competitions',
+        icon: Trophy,
+      },
+      {
+        name: 'Mentorship Analytics',
+        href: '/dashboard/analytics/mentorship',
+        icon: Users,
+      },
+      {
+        name: 'Opportunity Analytics',
+        href: '/dashboard/analytics/opportunities',
+        icon: Briefcase,
+      },
+      {
+        name: 'Organization Analytics',
+        href: '/dashboard/analytics/organization',
+        icon: Building2,
+      },
+      {
+        name: 'Reports Center',
+        href: '/dashboard/analytics/reports',
+        icon: FileText,
       }
     ]
   },

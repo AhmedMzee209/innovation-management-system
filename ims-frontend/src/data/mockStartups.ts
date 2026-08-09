@@ -78,7 +78,7 @@ export const MOCK_STARTUPS: Startup[] = approvedInnovations.slice(0, 50).map((in
   ];
   
   // Add 1-3 random team members
-  const otherUsers = Object.values(MOCK_USERS).filter(u => u.id !== innovation.primaryInnovatorId && u.role === 'ROLE_STUDENT');
+  const otherUsers = Object.values(MOCK_USERS).filter(u => u.id !== innovation.primaryInnovatorId && u.role === 'ROLE_INNOVATOR');
   for (let i = 0; i < randomInt(1, 3); i++) {
     const randomUser = sample(otherUsers);
     if (randomUser && !team.find(t => t.userId === randomUser.id)) {
