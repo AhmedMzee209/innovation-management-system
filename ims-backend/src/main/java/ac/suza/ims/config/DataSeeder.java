@@ -130,7 +130,6 @@ public class DataSeeder implements CommandLineRunner {
             User admin = User.builder()
                     .firstName("System")
                     .lastName("Administrator")
-                    .username("superadmin")
                     .email(adminEmail)
                     .password(passwordEncoder.encode("Admin@123"))
                     .enabled(true)

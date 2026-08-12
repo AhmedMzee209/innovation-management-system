@@ -1,33 +1,39 @@
 import { useEffect, useRef } from 'react';
 import { motion, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { STATISTICS } from '@/data/dummy';
+import { useLanguage } from '@/context/LanguageContext';
+
+// Bilingual stat labels
+const STAT_LABELS: Record<string, { en: string; sw: string }> = {
+  '1': { en: 'Active Users',            sw: 'Watumiaji Wanaofanya Kazi' },
+  '2': { en: 'Innovations Submitted',   sw: 'Ubunifu Uliowasilishwa' },
+  '3': { en: 'Registered Startups',     sw: 'Startup Zilizosajiliwa' },
+  '4': { en: 'Funding Distributed',     sw: 'Ufadhili Uliosambazwa' },
+  '5': { en: 'Active Mentors',          sw: 'Washauri Wanaofanya Kazi' },
+  '6': { en: 'Participating Schools',   sw: 'Shule Zinazoshiriki' },
+};
 
 const AnimatedCounter = ({ value, isFloat = false }: { value: number; isFloat?: boolean }) => {
   const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
-  
+  const isInView = useInView(ref, { once: true, margin: '-50px' });
+
   const motionValue = useMotionValue(0);
-  const springValue = useSpring(motionValue, { 
-    duration: 2500, 
-    bounce: 0,
-    damping: 20,
-    stiffness: 45
-  });
-  
+  const springValue = useSpring(motionValue, { duration: 2500, bounce: 0, damping: 20, stiffness: 45 });
+
   useEffect(() => {
-    if (isInView) {
-      motionValue.set(value);
-    }
+    if (isInView) motionValue.set(value);
   }, [isInView, value, motionValue]);
 
-  const displayValue = useTransform(springValue, (latest) => {
-    return isFloat ? latest.toFixed(1) : Math.floor(latest).toString();
-  });
+  const displayValue = useTransform(springValue, (latest) =>
+    isFloat ? latest.toFixed(1) : Math.floor(latest).toString()
+  );
 
   return <motion.span ref={ref}>{displayValue}</motion.span>;
 };
 
 export const Statistics = () => {
+  const { lang } = useLanguage();
+
   return (
     <section className="py-14" style={{ background: 'linear-gradient(135deg, #0d2137 0%, #0098c8 100%)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -46,11 +52,10 @@ export const Statistics = () => {
                 <AnimatedCounter value={stat.value} isFloat={stat.value % 1 !== 0} />
                 {stat.suffix}
               </div>
-              <div
-                className="w-6 h-0.5 my-2"
-                style={{ backgroundColor: '#e8b800' }}
-              />
-              <div className="text-xs text-blue-100 leading-tight">{stat.label}</div>
+              <div className="w-6 h-0.5 my-2" style={{ backgroundColor: '#e8b800' }} />
+              <div className="text-xs text-blue-100 leading-tight">
+                {STAT_LABELS[stat.id]?.[lang] ?? stat.label}
+              </div>
             </motion.div>
           ))}
         </div>

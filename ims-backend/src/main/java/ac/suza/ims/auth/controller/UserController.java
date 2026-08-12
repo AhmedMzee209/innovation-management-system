@@ -8,11 +8,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -26,10 +29,14 @@ public class UserController {
     @Operation(summary = "Get all users")
     @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN') or hasAuthority('USER_VIEW')")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
+    public ResponseEntity<ApiResponse<Page<UserResponse>>> getAllUsers(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) UUID roleId,
+            @RequestParam(required = false) Boolean enabled,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.success(
                 "Users fetched successfully",
-                userService.getAllUsers()
+                userService.getAllUsers(search, roleId, enabled, pageable)
         ));
     }
 

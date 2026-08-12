@@ -27,10 +27,6 @@ public class RegisterRequest {
     @Size(max = 50, message = "Last name must not exceed 50 characters")
     private String lastName;
 
-    @NotBlank(message = "Username is mandatory")
-    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
-    private String username;
-
     @NotBlank(message = "Email is mandatory")
     @Email(message = "Email must be a valid email address")
     @Size(max = 100, message = "Email must not exceed 100 characters")

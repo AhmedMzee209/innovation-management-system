@@ -1,82 +1,82 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '@/constants/routes';
-import { Menu, X, ChevronDown, Globe, LogIn, MailOpen, Map, Phone, Rocket } from 'lucide-react';
+import { Menu, X, ChevronDown, Globe, LogIn, MailOpen, Map, Phone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import suzaLogo from '@/assets/images/suza-logo.png';
+import smzLogo from '@/assets/images/smz-logo.png';
+import { useLanguage } from '@/context/LanguageContext';
 
-/* ─── Brand Colors (NACTVET palette) ─────────────────────── */
+/* ─── Brand Colors ─────────────────────────────────────────── */
 const C = {
-  topBar: '#111827',          // near-black utility bar
-  teal: '#0099cc',            // main nav teal
-  tealHover: '#007aaa',       // darker teal on hover
+  topBar: '#111827',
+  teal: '#0099cc',
+  tealHover: '#007aaa',
   tealLight: '#e5f5fb',
   gold: '#e8b800',
   white: '#ffffff',
 };
-
-/* ─── Nav links ──────────────────────────────────────────── */
-const navLinks = [
-  { label: 'Home', path: '/' },
-  {
-    label: 'About IMS',
-    path: '/about',
-    children: [
-      { label: 'Vision & Mission', path: '/about#mission' },
-      { label: 'Governance', path: '/about#governance' },
-      { label: 'Our History', path: '/about#history' },
-    ],
-  },
-  {
-    label: 'Innovation',
-    path: '/ecosystem',
-    children: [
-      { label: 'Ecosystem Overview', path: '/ecosystem' },
-      { label: 'Innovation Hubs', path: '/hubs' },
-      { label: 'Categories', path: '/categories' },
-    ],
-  },
-  {
-    label: 'Schools',
-    path: '/schools',
-  },
-  { label: 'Showcase', path: '/showcase' },
-  {
-    label: 'Media Center',
-    path: '/events',
-    children: [
-      { label: 'Events', path: '/events' },
-      { label: 'Success Stories', path: '/stories' },
-    ],
-  },
-  { label: 'Contact Us', path: '/contact' },
-  { label: 'Helpdesk', path: '/faq' },
-];
 
 export const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
+  const { t, toggle } = useLanguage();
+
+  // Build nav links dynamically from translations
+  const navLinks = [
+    { label: t.home, path: '/' },
+    {
+      label: t.aboutIms,
+      path: '/about',
+      children: [
+        { label: t.visionMission, path: '/about#mission' },
+        { label: t.governance, path: '/about#governance' },
+        { label: t.ourHistory, path: '/about#history' },
+      ],
+    },
+    {
+      label: t.innovation,
+      path: '/ecosystem',
+      children: [
+        { label: t.ecosystemOverview, path: '/ecosystem' },
+        { label: t.innovationHubs, path: '/hubs' },
+        { label: t.categories, path: '/categories' },
+      ],
+    },
+    { label: t.schools, path: '/schools' },
+    { label: t.showcase, path: '/showcase' },
+    {
+      label: t.mediaCenter,
+      path: '/events',
+      children: [
+        { label: t.events, path: '/events' },
+        { label: t.successStories, path: '/stories' },
+      ],
+    },
+    { label: t.contactUs, path: '/contact' },
+    { label: t.helpdeskNav, path: '/faq' },
+  ];
+
+  const utilLinks = [
+    { label: t.staffMail, icon: MailOpen },
+    { label: t.eOffice, icon: Globe },
+    { label: t.siteMap, icon: Map },
+    { label: t.helpdesk, icon: Phone },
+  ];
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50" style={{ fontFamily: 'Arial, sans-serif' }}>
 
-      {/* ═══════════════════════════════════════════════════
-          TIER 1 — Top Utility Bar (dark, thin)
-      ═══════════════════════════════════════════════════ */}
+      {/* ═══ TIER 1 — Top Utility Bar ═══════════════════════ */}
       <div style={{ backgroundColor: C.topBar, borderBottom: `2px solid ${C.gold}` }}>
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-8">
 
           {/* Left: utility links */}
           <div className="flex items-center space-x-4">
-            {[
-              { label: 'Staff Mail', icon: MailOpen },
-              { label: 'e-Office', icon: Globe },
-              { label: 'Site Map', icon: Map },
-              { label: 'Helpdesk', icon: Phone },
-            ].map(({ label, icon: Icon }) => (
+            {utilLinks.map(({ label, icon: Icon }) => (
               <a
                 key={label}
                 href="#"
@@ -109,11 +109,9 @@ export const Navbar = () => {
         </div>
       </div>
 
-      {/* ═══════════════════════════════════════════════════
-          TIER 2 — Brand / Identity Bar (white)
-      ═══════════════════════════════════════════════════ */}
+      {/* ═══ TIER 2 — Brand / Identity Bar ══════════════════ */}
       <div className="bg-white border-b border-gray-100">
-        {/* Decorative top stripe (Tanzania flag colors: blue, black, yellow, green) */}
+        {/* Tanzania flag stripe */}
         <div className="flex h-1 w-full">
           <div className="flex-1" style={{ backgroundColor: '#3cb371' }} />
           <div className="flex-1" style={{ backgroundColor: '#000' }} />
@@ -125,45 +123,31 @@ export const Navbar = () => {
 
           {/* Left — SUZA Logo */}
           <div className="shrink-0 flex items-center">
-            <img 
-              src={suzaLogo} 
-              alt="SUZA Logo" 
-              className="h-16 w-auto object-contain"
-            />
+            <img src={suzaLogo} alt="SUZA Logo" className="h-16 w-auto object-contain" />
           </div>
 
           {/* Center — Institution Name */}
           <div className="flex-1 text-center px-4">
-            <p className="text-xs text-gray-500 font-medium tracking-wide">
-              The United Republic of Tanzania
-            </p>
+            <p className="text-xs text-gray-500 font-medium tracking-wide">{t.country}</p>
             <h1
               className="font-extrabold uppercase leading-tight tracking-tight text-sm md:text-base lg:text-lg"
               style={{ color: C.teal }}
             >
-              The State University of Zanzibar (SUZA)
+              {t.uniName}
             </h1>
             <p className="text-xs italic mt-0.5 hidden sm:block" style={{ color: '#555' }}>
-              Innovation Management System (IMS) — Striving for Excellence in Innovation and Research
+              {t.tagline}
             </p>
           </div>
 
-          {/* Right — IMS Logo placeholder */}
+          {/* Right — SMZ Logo */}
           <div className="shrink-0 flex items-center">
-            <div
-              className="w-16 h-16 rounded-full border-4 border-yellow-200 flex flex-col items-center justify-center shadow-sm"
-              style={{ background: `linear-gradient(135deg, ${C.teal}, #0d2137)` }}
-            >
-              <Rocket size={20} className="text-white mb-0.5" />
-              <span className="text-[8px] font-black text-yellow-300 tracking-wide">IMS</span>
-            </div>
+            <img src={smzLogo} alt="SMZ Logo" className="h-16 w-auto object-contain" />
           </div>
         </div>
       </div>
 
-      {/* ═══════════════════════════════════════════════════
-          TIER 3 — Main Navigation Bar (solid teal)
-      ═══════════════════════════════════════════════════ */}
+      {/* ═══ TIER 3 — Main Navigation Bar ═══════════════════ */}
       <nav style={{ backgroundColor: C.teal, borderBottom: `4px solid ${C.gold}` }}>
         <div className="max-w-7xl mx-auto px-4">
 
@@ -187,9 +171,7 @@ export const Navbar = () => {
                     )}
                   >
                     {link.label}
-                    {link.children && (
-                      <ChevronDown size={12} className="ml-0.5 opacity-80" />
-                    )}
+                    {link.children && <ChevronDown size={12} className="ml-0.5 opacity-80" />}
                   </Link>
 
                   {/* Dropdown */}
@@ -208,7 +190,6 @@ export const Navbar = () => {
                             key={child.label}
                             to={child.path}
                             className="flex items-center px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 border-l-[3px] border-transparent transition-all"
-                            style={{ ['--hover-border' as string]: C.teal }}
                             onMouseEnter={(e) => {
                               (e.currentTarget as HTMLAnchorElement).style.borderLeftColor = C.teal;
                               (e.currentTarget as HTMLAnchorElement).style.color = C.teal;
@@ -228,35 +209,48 @@ export const Navbar = () => {
               ))}
             </div>
 
-            {/* Right — Language / Sign In */}
+            {/* Right — Language toggle + Sign In */}
             <div className="flex items-center space-x-2">
               <Link
                 to={ROUTES.PUBLIC.LOGIN}
                 className="flex items-center space-x-1.5 px-4 py-1.5 text-[12px] font-bold rounded border border-white/40 text-white hover:bg-white hover:text-gray-900 transition-all"
               >
                 <LogIn size={13} />
-                <span>Sign In</span>
+                <span>{t.signIn}</span>
               </Link>
-              <a
-                href="#"
-                className="flex items-center space-x-1.5 px-3 py-1.5 rounded border border-white/30 text-white text-[12px] hover:bg-white/20 transition-all"
+
+              {/* ── Language Toggle Button ── */}
+              <button
+                onClick={toggle}
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded border border-white/30 text-white text-[12px] font-semibold hover:bg-white hover:text-gray-900 transition-all"
+                aria-label="Toggle language"
               >
                 <Globe size={13} />
-                <span>Kiswahili</span>
-              </a>
+                <span>{t.langToggle}</span>
+              </button>
             </div>
           </div>
 
           {/* Mobile nav toggle */}
           <div className="md:hidden flex items-center justify-between h-10">
-            <span className="text-white font-bold text-sm">SUZA IMS</span>
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="text-white p-1"
-              aria-label="Toggle menu"
-            >
-              {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-            </button>
+            <span className="text-white font-bold text-sm">{t.mobileTitle}</span>
+            <div className="flex items-center gap-2">
+              {/* Mobile language toggle */}
+              <button
+                onClick={toggle}
+                className="flex items-center gap-1 text-white text-[11px] font-semibold border border-white/30 rounded px-2 py-1 hover:bg-white/20 transition-all"
+              >
+                <Globe size={11} />
+                <span>{t.langToggle}</span>
+              </button>
+              <button
+                onClick={() => setMobileOpen(!mobileOpen)}
+                className="text-white p-1"
+                aria-label="Toggle menu"
+              >
+                {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -293,7 +287,7 @@ export const Navbar = () => {
                   className="block mt-2 px-3 py-2.5 text-sm text-center font-bold rounded text-white"
                   style={{ backgroundColor: C.teal }}
                 >
-                  Sign In to Portal
+                  {t.signInPortal}
                 </Link>
               </div>
             </motion.div>

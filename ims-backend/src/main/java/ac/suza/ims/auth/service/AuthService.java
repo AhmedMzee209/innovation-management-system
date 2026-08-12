@@ -7,5 +7,6 @@ public interface AuthService {
     AuthenticationResponse login(LoginRequest request);
     RefreshTokenResponse refresh(RefreshTokenRequest request);
     UserResponse getMe();
+    UserResponse updateMe(UserRequest request);
     void logout();
 }

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { 
@@ -9,14 +9,15 @@ import {
   clearSelection, 
   setPage 
 } from '@/store/slices/usersSlice';
-import { MOCK_USERS, User } from '@/data/mockUsers';
-import { MOCK_ROLES } from '@/data/mockRoles';
+import { useQuery } from '@tanstack/react-query';
+import { userService } from '@/services/api/userService';
+import { rbacService } from '@/services/api/rbacService';
+import { UserResponse } from '@/types/auth';
 import { 
   createColumnHelper, 
   flexRender, 
   getCoreRowModel, 
   getSortedRowModel, 
-  getPaginationRowModel,
   useReactTable,
   SortingState
 } from '@tanstack/react-table';
@@ -24,38 +25,60 @@ import { UserAvatar } from '@/components/dashboard/users/UserAvatar';
 import { StatusBadge } from '@/components/dashboard/users/StatusBadge';
 import { RoleBadge } from '@/components/dashboard/users/RoleBadge';
 import { ActionDropdown } from '@/components/dashboard/users/ActionDropdown';
-import { Search, Filter, Download, Upload, Plus, Trash2, Shield, X, Users as UsersIcon, UserCheck, UserPlus } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Search, Filter, Download, Upload, Plus, Trash2, Shield, X, Users as UsersIcon, UserCheck, UserPlus, Loader2 } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePermissions } from '@/hooks/usePermissions';
 
-const columnHelper = createColumnHelper<User>();
+const columnHelper = createColumnHelper<UserResponse>();
 
 export const UserList = () => {
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+  const roleParam = searchParams.get('role');
   const { searchQuery, roleFilter, statusFilter, selectedUserIds, page, pageSize } = useSelector((state: RootState) => state.users);
+
+  useEffect(() => {
+    if (roleParam) {
+      dispatch(setRoleFilter(roleParam));
+    } else {
+      dispatch(setRoleFilter(null));
+    }
+  }, [roleParam, dispatch]);
   
   const [sorting, setSorting] = useState<SortingState>([]);
+  const { hasPermission } = usePermissions();
 
-  // Apply filters
-  const filteredData = useMemo(() => {
-    return MOCK_USERS.filter(user => {
-      const matchesSearch = (user.firstName + ' ' + user.lastName).toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            user.email.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesRole = roleFilter ? user.role === roleFilter : true;
-      const matchesStatus = statusFilter ? user.status === statusFilter : true;
-      return matchesSearch && matchesRole && matchesStatus;
-    });
-  }, [searchQuery, roleFilter, statusFilter]);
+  // Fetch users from API
+  const { data: usersPage, isLoading, isError } = useQuery({
+    queryKey: ['users', { page, pageSize, searchQuery, roleFilter, statusFilter, sorting }],
+    queryFn: () => userService.getUsers({
+      page: page - 1,
+      size: pageSize,
+      search: searchQuery || undefined,
+      roleId: roleFilter || undefined,
+      enabled: statusFilter === 'Active' ? true : statusFilter === 'Inactive' ? false : undefined,
+      sort: sorting.length > 0 ? `${sorting[0].id},${sorting[0].desc ? 'desc' : 'asc'}` : undefined,
+    }),
+  });
 
-  // Statistics
+  // Fetch roles for filter dropdown
+  const { data: roles } = useQuery({
+    queryKey: ['roles'],
+    queryFn: () => rbacService.getRoles(),
+  });
+
+  const users = usersPage?.content || [];
+
+  // Statistics (Mocked for now since backend doesn't provide these aggregate stats in this endpoint)
   const stats = useMemo(() => {
     return {
-      total: MOCK_USERS.length,
-      active: MOCK_USERS.filter(u => u.status === 'Active').length,
-      newThisMonth: 12, // Mock stat
+      total: usersPage?.totalElements || 0,
+      active: users.filter(u => u.enabled).length, // Only active in current page, real app might need a separate stats endpoint
+      newThisMonth: 0,
     };
-  }, []);
+  }, [usersPage, users]);
 
   const columns = useMemo(() => [
     columnHelper.display({
@@ -63,11 +86,10 @@ export const UserList = () => {
       header: ({ table }) => (
         <input
           type="checkbox"
-          checked={table.getIsAllPageRowsSelected() || (selectedUserIds.length > 0 && selectedUserIds.length === filteredData.length)}
+          checked={table.getIsAllPageRowsSelected() || (selectedUserIds.length > 0 && selectedUserIds.length === users.length && users.length > 0)}
           onChange={(e) => {
             if (e.target.checked) {
-              // Select all
-              filteredData.forEach(u => {
+              users.forEach(u => {
                 if (!selectedUserIds.includes(u.id)) dispatch(toggleUserSelection(u.id));
               });
             } else {
@@ -93,7 +115,7 @@ export const UserList = () => {
           <UserAvatar 
             firstName={row.original.firstName} 
             lastName={row.original.lastName} 
-            imageUrl={row.original.avatarUrl}
+            imageUrl={row.original.profilePhoto}
             size="sm"
           />
           <div>
@@ -105,38 +127,45 @@ export const UserList = () => {
         </div>
       ),
     }),
-    columnHelper.accessor('role', {
+    columnHelper.accessor('roles', {
       header: 'Role',
-      cell: ({ getValue }) => <RoleBadge roleId={getValue()} />,
+      cell: ({ row }) => {
+        const roleName = row.original.roles && row.original.roles.length > 0 ? row.original.roles[0].name : 'STUDENT';
+        return <RoleBadge roleId={roleName} />
+      },
     }),
-    columnHelper.accessor('school', {
+    columnHelper.accessor('email', {
       header: 'Organization',
-      cell: ({ row }) => (
+      cell: () => (
         <div className="flex flex-col">
-          <span className="text-sm text-gray-900 dark:text-gray-100">{row.original.school}</span>
-          <span className="text-xs text-gray-500">{row.original.innovationHub}</span>
+          <span className="text-sm text-gray-900 dark:text-gray-100">SUZA</span>
+          <span className="text-xs text-gray-500">-</span>
         </div>
       ),
     }),
-    columnHelper.accessor('status', {
+    columnHelper.accessor('enabled', {
       header: 'Status',
-      cell: ({ getValue }) => <StatusBadge status={getValue()} />,
+      cell: ({ getValue }) => <StatusBadge status={getValue() ? 'Active' : 'Inactive'} />,
     }),
     columnHelper.display({
       id: 'actions',
       header: '',
-      cell: ({ row }) => <ActionDropdown userId={row.original.id} status={row.original.status} />,
+      cell: ({ row }) => <ActionDropdown user={row.original} status={row.original.enabled ? 'Active' : 'Inactive'} />,
     }),
-  ], [selectedUserIds, filteredData, dispatch]);
+  ], [selectedUserIds, users, dispatch]);
 
   const table = useReactTable({
-    data: filteredData,
+    data: users,
     columns,
-    state: { sorting },
+    state: { 
+      sorting,
+      pagination: { pageIndex: page - 1, pageSize }
+    },
     onSortingChange: setSorting,
+    pageCount: usersPage?.totalPages ?? -1,
+    manualPagination: true,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
   });
 
   return (
@@ -154,9 +183,11 @@ export const UserList = () => {
           <button className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm flex items-center">
             <Upload size={16} className="mr-2" /> Import
           </button>
-          <Link to="/dashboard/users/new" className="px-4 py-2 bg-[#0098c8] hover:bg-[#007aa3] text-white rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center">
-            <Plus size={16} className="mr-2" /> Add User
-          </Link>
+          {hasPermission('USER_CREATE') && (
+            <Link to="/dashboard/users/new" className="px-4 py-2 bg-[#0098c8] hover:bg-[#007aa3] text-white rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center">
+              <Plus size={16} className="mr-2" /> Add User
+            </Link>
+          )}
         </div>
       </div>
 
@@ -232,7 +263,7 @@ export const UserList = () => {
                 className="w-full pl-9 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0098c8] appearance-none dark:text-white"
               >
                 <option value="">All Roles</option>
-                {MOCK_ROLES.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                {roles?.map(r => <option key={r.id} value={r.id}>{r.name.replace('ROLE_', '').replace(/_/g, ' ')}</option>)}
               </select>
             </div>
             <div className="relative flex-1 sm:flex-none sm:w-36">
@@ -258,15 +289,39 @@ export const UserList = () => {
               {table.getHeaderGroups().map(headerGroup => (
                 <tr key={headerGroup.id} className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
                   {headerGroup.headers.map(header => (
-                    <th key={header.id} className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                      {flexRender(header.column.columnDef.header, header.getContext())}
+                    <th key={header.id} className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" onClick={header.column.getToggleSortingHandler()}>
+                      <div className="flex items-center space-x-1">
+                        <span>{flexRender(header.column.columnDef.header, header.getContext())}</span>
+                        {header.column.getIsSorted() ? (
+                          <span className="text-gray-400">
+                            {header.column.getIsSorted() === 'desc' ? ' ↓' : ' ↑'}
+                          </span>
+                        ) : (
+                          <span className="text-transparent group-hover:text-gray-300"> ↕</span>
+                        )}
+                      </div>
                     </th>
                   ))}
                 </tr>
               ))}
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
-              {table.getRowModel().rows.length > 0 ? (
+              {isLoading ? (
+                <tr>
+                  <td colSpan={columns.length} className="py-12 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-2">
+                      <Loader2 size={32} className="text-[#0098c8] animate-spin mb-2" />
+                      <p className="text-sm font-medium text-gray-500">Loading users...</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : isError ? (
+                <tr>
+                  <td colSpan={columns.length} className="py-12 text-center text-red-500">
+                    <p>Failed to load users.</p>
+                  </td>
+                </tr>
+              ) : table.getRowModel().rows.length > 0 ? (
                 table.getRowModel().rows.map(row => (
                   <tr 
                     key={row.id} 
@@ -301,19 +356,19 @@ export const UserList = () => {
         {/* Pagination */}
         <div className="p-4 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between">
           <p className="text-sm text-gray-500">
-            Showing <span className="font-medium text-gray-900 dark:text-white">{table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}</span> to <span className="font-medium text-gray-900 dark:text-white">{Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize, filteredData.length)}</span> of <span className="font-medium text-gray-900 dark:text-white">{filteredData.length}</span> results
+            Showing <span className="font-medium text-gray-900 dark:text-white">{(page - 1) * pageSize + 1}</span> to <span className="font-medium text-gray-900 dark:text-white">{Math.min(page * pageSize, usersPage?.totalElements || 0)}</span> of <span className="font-medium text-gray-900 dark:text-white">{usersPage?.totalElements || 0}</span> results
           </p>
           <div className="flex items-center space-x-2">
             <button 
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
+              onClick={() => dispatch(setPage(page - 1))}
+              disabled={page <= 1}
               className="px-3 py-1.5 text-sm font-medium border border-gray-200 dark:border-gray-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-800 dark:text-white transition-colors"
             >
               Previous
             </button>
             <button 
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
+              onClick={() => dispatch(setPage(page + 1))}
+              disabled={!usersPage || page >= usersPage.totalPages}
               className="px-3 py-1.5 text-sm font-medium border border-gray-200 dark:border-gray-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-800 dark:text-white transition-colors"
             >
               Next

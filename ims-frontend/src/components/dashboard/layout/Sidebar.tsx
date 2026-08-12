@@ -3,8 +3,8 @@ import { RootState } from '@/store';
 import { SIDEBAR_NAVIGATION } from '@/data/navigation';
 import { SidebarItem } from './SidebarItem';
 import { cn } from '@/lib/utils';
-import { Rocket } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import suzaLogo from '@/assets/images/suza-logo.png';
 
 export const Sidebar = () => {
   const { isSidebarOpen } = useSelector((state: RootState) => state.dashboard);
@@ -30,13 +30,14 @@ export const Sidebar = () => {
       )}
     >
       {/* Brand Header */}
-      <div 
+      <div
         className="h-16 flex items-center justify-center border-b-4 shrink-0 px-4"
         style={{ backgroundColor: '#0098c8', borderBottomColor: '#e8b800' }}
       >
         <Link to="/dashboard" className="flex items-center space-x-3 overflow-hidden w-full">
-          <div className="w-10 h-10 rounded-xl border border-white/20 bg-white/10 flex items-center justify-center shrink-0">
-            <Rocket size={20} className="text-white" />
+          {/* SUZA logo — white background circle for visibility on teal */}
+          <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+            <img src={suzaLogo} alt="SUZA" className="w-9 h-9 object-contain" />
           </div>
           {isSidebarOpen && (
             <div className="flex flex-col whitespace-nowrap">
@@ -70,8 +71,8 @@ export const Sidebar = () => {
       {/* Footer / Context Box */}
       {isSidebarOpen && (
         <div className="p-4 bg-gradient-to-br from-[#e5f5fb] to-[#f4fbfd] dark:from-[#0098c8]/10 dark:to-transparent border-t border-[#b3e3f4] dark:border-gray-800 shrink-0 flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-[#0098c8] flex items-center justify-center shrink-0">
-            <Rocket size={20} className="text-white" />
+          <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0 shadow-sm border border-gray-100 overflow-hidden">
+            <img src={suzaLogo} alt="SUZA" className="w-9 h-9 object-contain" />
           </div>
           <div className="flex flex-col overflow-hidden whitespace-nowrap">
             <span className="text-sm font-bold text-[#0d2137] dark:text-white truncate">SUZA Innovation Hub</span>

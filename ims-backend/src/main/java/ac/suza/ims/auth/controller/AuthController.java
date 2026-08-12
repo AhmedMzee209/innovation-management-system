@@ -58,6 +58,15 @@ public class AuthController {
         ));
     }
 
+    @Operation(summary = "Update current authenticated user")
+    @PutMapping("/me")
+    public ResponseEntity<ApiResponse<UserResponse>> updateMe(@Valid @RequestBody UserRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(
+                "User profile updated successfully",
+                authService.updateMe(request)
+        ));
+    }
+
     @Operation(summary = "Logout user")
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout() {

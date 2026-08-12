@@ -25,6 +25,7 @@ import { Forbidden } from '@/pages/errors/Forbidden';
 
 // Auth Pages
 import { Login } from '@/pages/auth/Login';
+import { Register } from '@/pages/auth/Register';
 import { ForgotPassword } from '@/pages/auth/ForgotPassword';
 import { ResetPassword } from '@/pages/auth/ResetPassword';
 import { VerifyEmail } from '@/pages/auth/VerifyEmail';
@@ -206,7 +207,7 @@ export const AppRouter = () => {
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/session-expired" element={<SessionExpired />} />
-            <Route path="/register" element={<div>Register Placeholder</div>} />
+            <Route path="/register" element={<Register />} />
           </Route>
         </Route>
       </Route>

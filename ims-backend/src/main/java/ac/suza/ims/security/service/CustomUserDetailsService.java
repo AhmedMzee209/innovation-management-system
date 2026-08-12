@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -33,14 +35,20 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
+        Set<String> authorities = new HashSet<>();
+        user.getRoles().forEach(role -> {
+            authorities.add("ROLE_" + role.getName().name());
+            role.getPermissions().forEach(permission -> {
+                authorities.add(permission.getName());
+            });
+        });
+
         return CustomUserDetails.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .active(user.isEnabled())
-                .roles(user.getRoles().stream()
-                        .map(role -> role.getName().name())
-                        .collect(Collectors.toSet()))
+                .roles(authorities)
                 .build();
     }
 }

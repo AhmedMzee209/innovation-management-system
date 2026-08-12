@@ -2,8 +2,9 @@ import { AuthenticationCard } from '@/components/auth/AuthenticationCard';
 import { AuthenticationFooter } from '@/components/auth/AuthenticationFooter';
 import { LoginForm } from '@/components/auth/LoginForm';
 import suzaLogo from '@/assets/images/suza-logo.png';
-import { Rocket } from 'lucide-react';
+import smzLogo from '@/assets/images/smz-logo.png';
 import { Link } from 'react-router-dom';
+import { UserPlus } from 'lucide-react';
 
 export const Login = () => {
   return (
@@ -23,10 +24,7 @@ export const Login = () => {
         <div className="flex justify-center mb-8 space-x-4 items-center">
           <img src={suzaLogo} alt="SUZA" className="h-14 w-auto object-contain" />
           <div className="w-px h-10 bg-gray-200 dark:bg-gray-700" />
-          <div className="w-12 h-12 rounded-full flex flex-col items-center justify-center bg-gradient-to-br from-[#0098c8] to-[#0d2137] shadow-sm shrink-0">
-            <Rocket size={18} className="text-white mb-0.5" />
-            <span className="text-[7px] font-black text-yellow-300 tracking-wider">IMS</span>
-          </div>
+          <img src={smzLogo} alt="SMZ" className="h-14 w-auto object-contain" />
         </div>
 
         <div className="text-center mb-8">
@@ -39,6 +37,20 @@ export const Login = () => {
         </div>
 
         <LoginForm />
+        {/* Register link */}
+        <div className="mt-6 pt-5 border-t border-gray-100 dark:border-gray-700 text-center mb-6">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            New to SUZA IMS?{' '}
+            <Link
+              to="/register"
+              className="inline-flex items-center gap-1 font-bold text-[#0098c8] hover:text-[#0d2137] dark:hover:text-[#e8b800] transition-colors"
+            >
+              <UserPlus size={14} />
+              Create an Account
+            </Link>
+          </p>
+        </div>
+
         <AuthenticationFooter />
       </AuthenticationCard>
     </>

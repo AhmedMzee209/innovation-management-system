@@ -4,17 +4,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useMutation } from '@tanstack/react-query';
+import Swal from 'sweetalert2';
 import { EmailInput } from './EmailInput';
 import { PasswordInput } from './PasswordInput';
 import { RememberMe } from './RememberMe';
 import { LoadingButton } from './LoadingButton';
 import { ErrorMessage } from './ErrorMessage';
 import { SocialLoginButtons } from './SocialLoginButtons';
-import { MOCK_USERS } from '@/data/mockUsers';
-import { loginStart, loginSuccess, loginFailure, setRememberMe } from '@/store/slices/authSlice';
+import { loginStart, loginSuccess, loginFailure, setRememberMe, mapUserResponseToProfile } from '@/store/slices/authSlice';
 import { RootState } from '@/store';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Users } from 'lucide-react';
+import { authService } from '@/services/auth/auth.service';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -25,10 +25,9 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export const LoginForm = () => {
-  const [showDemoAccounts, setShowDemoAccounts] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { status, error } = useSelector((state: RootState) => state.auth);
+  const { error } = useSelector((state: RootState) => state.auth);
   
   const {
     register,
@@ -42,75 +41,58 @@ export const LoginForm = () => {
     },
   });
 
-  const onSubmit = async (data: LoginFormValues) => {
+  const loginMutation = useMutation({
+    mutationFn: (data: LoginFormValues) => authService.login({ email: data.email, password: data.password }),
+    onSuccess: (response, variables) => {
+      // Store tokens
+      if (variables.rememberMe) {
+        localStorage.setItem('rememberMe', 'true');
+      } else {
+        localStorage.removeItem('rememberMe');
+      }
+      localStorage.setItem('token', response.data.accessToken);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
+
+      dispatch(loginSuccess({ 
+        user: mapUserResponseToProfile(response.data.user as any), 
+        token: response.data.accessToken 
+      }));
+
+      Swal.fire({
+        html: `
+          <div class="flex flex-col items-center justify-center">
+            <h2 class="text-lg font-bold text-[#0d2137] mb-2">Welcome Back!</h2>
+            <div class="animate-spin rounded-full h-8 w-8 border-[3px] border-gray-100 border-t-[#0098c8] mb-2"></div>
+            <p class="text-xs text-gray-500 font-medium">Preparing your dashboard...</p>
+          </div>
+        `,
+        showConfirmButton: false,
+        timer: 2000,
+        width: '18rem',
+        padding: '1.25rem',
+        background: '#ffffff',
+        customClass: {
+          popup: 'rounded-2xl shadow-xl border border-gray-100',
+        }
+      }).then(() => {
+        navigate('/dashboard');
+      });
+    },
+    onError: (err: any) => {
+      const msg = err?.response?.data?.message || err?.response?.data?.error || 'Invalid email or password. Please try again.';
+      dispatch(loginFailure(msg));
+    }
+  });
+
+  const onSubmit = (data: LoginFormValues) => {
     dispatch(loginStart());
     dispatch(setRememberMe(data.rememberMe));
-
-    // Simulate network request
-    setTimeout(() => {
-      // Dummy authentication logic
-      const userKey = Object.keys(MOCK_USERS).find((key) => MOCK_USERS[key].email === data.email);
-      
-      if (userKey && MOCK_USERS[userKey].password === data.password) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { password, ...userProfile } = MOCK_USERS[userKey];
-        dispatch(loginSuccess({ user: userProfile, token: 'dummy_jwt_token_123' }));
-        navigate('/dashboard'); // Will be updated when dashboards are built
-      } else {
-        dispatch(loginFailure('Invalid email or password. Please try again.'));
-      }
-    }, 1500);
-  };
-
-  const handleDemoAccountSelect = (key: string) => {
-    setValue('email', MOCK_USERS[key].email);
-    setValue('password', MOCK_USERS[key].password);
-    setShowDemoAccounts(false);
+    loginMutation.mutate(data);
   };
 
   return (
     <div className="w-full">
       <ErrorMessage message={error || ''} />
-
-      {/* Demo Accounts Dropdown (For Phase 2 Testing) */}
-      <div className="mb-6 mt-4 relative">
-        <button
-          type="button"
-          onClick={() => setShowDemoAccounts(!showDemoAccounts)}
-          className="w-full flex items-center justify-between px-4 py-2.5 bg-[#e5f5fb] text-[#0098c8] border border-[#b3e3f4] rounded-xl text-sm font-bold hover:bg-[#d6f0fa] transition-colors"
-        >
-          <div className="flex items-center space-x-2">
-            <Users size={16} />
-            <span>Select Demo Account</span>
-          </div>
-          <ChevronDown size={16} className={`transition-transform ${showDemoAccounts ? 'rotate-180' : ''}`} />
-        </button>
-
-        <AnimatePresence>
-          {showDemoAccounts && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden"
-            >
-              <div className="max-h-48 overflow-y-auto py-1">
-                {Object.entries(MOCK_USERS).map(([key, user]) => (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => handleDemoAccountSelect(key)}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 flex items-center justify-between"
-                  >
-                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{user.role.replace(/_/g, ' ')}</span>
-                    <span className="text-xs text-gray-500">{user.email}</span>
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <EmailInput
@@ -137,7 +119,7 @@ export const LoginForm = () => {
 
         <LoadingButton
           type="submit"
-          loading={status === 'loading'}
+          loading={loginMutation.isPending}
           className="mt-6"
         >
           Sign In to Portal

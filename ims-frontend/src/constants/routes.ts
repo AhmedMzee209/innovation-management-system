@@ -6,8 +6,8 @@ export const ROUTES = {
   },
   PROTECTED: {
     DASHBOARD: '/dashboard',
-    PROFILE: '/profile',
-    SETTINGS: '/settings',
+    PROFILE: '/dashboard/profile',
+    SETTINGS: '/dashboard/settings',
   },
   ERRORS: {
     NOT_FOUND: '*',

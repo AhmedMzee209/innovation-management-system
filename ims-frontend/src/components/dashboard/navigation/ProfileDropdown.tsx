@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { logout } from '@/store/slices/authSlice';
 import { useNavigate, Link } from 'react-router-dom';
+import { authService } from '@/services/auth/auth.service';
 
 export const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,9 +24,17 @@ export const ProfileDropdown = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+    } catch (e) {
+      // Ignore error
+    } finally {
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      dispatch(logout());
+      navigate('/login');
+    }
   };
 
   if (!user) return null;

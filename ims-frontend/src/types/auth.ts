@@ -6,7 +6,7 @@ export type Role =
   | 'MENTOR'
   | 'REVIEWER'
   | 'INNOVATOR'
-  | 'INNOVATOR';
+  | 'STUDENT';
 
 export interface UserProfile {
   id: string;
@@ -16,4 +16,26 @@ export interface UserProfile {
   role: Role;
   avatar: string;
   department?: string;
+  phoneNumber?: string;
+}
+
+// Backend Response Types
+export interface RoleResponse {
+  id: string;
+  name: Role;
+  description?: string;
+}
+
+export interface UserResponse {
+  id: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  email: string;
+  phoneNumber?: string;
+  gender?: string;
+  profilePhoto?: string;
+  enabled: boolean;
+  emailVerified: boolean;
+  roles: RoleResponse[];
 }

@@ -1,19 +1,20 @@
-import { useState } from 'react';
-import { useForm } from 'react-redux'; // Wait, React Hook Form is `react-hook-form`
-// I will import it from react-hook-form. Let's make sure it's installed.
 import { useForm as useRHF } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Camera, User, Mail, Phone, Building2, Shield, Lock, Save, ArrowLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MOCK_ROLES } from '@/data/mockRoles';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { authService } from '@/services/auth/auth.service';
+import { userService } from '@/services/api/userService';
+import { rbacService } from '@/services/api/rbacService';
+import Swal from 'sweetalert2';
 
 const schema = z.object({
   firstName: z.string().min(2, 'First name is required'),
   lastName: z.string().min(2, 'Last name is required'),
   email: z.string().email('Valid email is required'),
-  phone: z.string().min(10, 'Valid phone number is required'),
-  gender: z.enum(['Male', 'Female', 'Other']),
+  phoneNumber: z.string().min(10, 'Valid phone number is required').regex(/^\+?[1-9]\d{1,14}$/, 'Invalid format (e.g. 255...)'),
+  gender: z.enum(['MALE', 'FEMALE', 'OTHER']),
   role: z.string().min(1, 'Role is required'),
   school: z.string().optional(),
   department: z.string().optional(),
@@ -31,21 +32,82 @@ type FormValues = z.infer<typeof schema>;
 
 export const CreateUser = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useRHF<FormValues>({
+  const { data: roles } = useQuery({
+    queryKey: ['roles'],
+    queryFn: () => rbacService.getRoles(),
+  });
+
+  const { register, handleSubmit, formState: { errors } } = useRHF<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       status: 'Active',
-      gender: 'Male'
+      gender: 'MALE'
     }
   });
 
-  const onSubmit = async (data: FormValues) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log(data);
-    navigate('/dashboard/users');
+  const createUserMutation = useMutation({
+    mutationFn: async (data: FormValues) => {
+      // 1. Register the user
+      const authRes = await authService.register({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        password: data.password,
+        gender: data.gender as any,
+      });
+
+      const userId = authRes.user.id;
+
+      // 2. Update their role, status and other fields
+      await userService.updateUser(userId, {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        gender: data.gender,
+        roleIds: [data.role],
+        enabled: data.status === 'Active'
+      });
+      return authRes;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'User created successfully',
+        showConfirmButton: false,
+        timer: 3000,
+        width: '18rem',
+        padding: '1rem',
+        customClass: { popup: 'rounded-xl shadow-lg border border-gray-100' }
+      });
+      navigate('/dashboard/users');
+    },
+    onError: (error: any) => {
+      const message = error.response?.data?.message || 'Failed to create user. Email may exist or password may not meet criteria.';
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'error',
+        title: 'Creation Failed',
+        text: message,
+        showConfirmButton: false,
+        timer: 5000,
+        width: '24rem',
+        padding: '1rem',
+        customClass: { popup: 'rounded-xl shadow-lg border border-gray-100' }
+      });
+    }
+  });
+
+  const onSubmit = (data: FormValues) => {
+    createUserMutation.mutate(data);
   };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,16 +190,16 @@ export const CreateUser = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone Number <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                  <input {...register('phone')} className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] bg-white dark:bg-gray-900 dark:text-white" />
+                  <input {...register('phoneNumber')} className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] bg-white dark:bg-gray-900 dark:text-white" />
                 </div>
-                {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
+                {errors.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber.message}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gender</label>
                 <select {...register('gender')} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] bg-white dark:bg-gray-900 dark:text-white">
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                  <option value="OTHER">Other</option>
                 </select>
               </div>
             </div>
@@ -157,7 +219,7 @@ export const CreateUser = () => {
                   <Shield className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                   <select {...register('role')} className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] bg-white dark:bg-gray-900 dark:text-white">
                     <option value="">Select a role...</option>
-                    {MOCK_ROLES.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                    {roles?.map(r => <option key={r.id} value={r.id}>{r.name.replace('ROLE_', '').replace(/_/g, ' ')}</option>)}
                   </select>
                 </div>
                 {errors.role && <p className="text-red-500 text-xs mt-1">{errors.role.message}</p>}
@@ -216,8 +278,8 @@ export const CreateUser = () => {
             <Link to="/dashboard/users" className="px-6 py-2.5 bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg text-sm font-medium transition-colors">
               Cancel
             </Link>
-            <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 bg-[#0098c8] hover:bg-[#007aa3] text-white rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center disabled:opacity-70 disabled:cursor-not-allowed">
-              {isSubmitting ? (
+            <button type="submit" disabled={createUserMutation.isPending} className="px-6 py-2.5 bg-[#0098c8] hover:bg-[#007aa3] text-white rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center disabled:opacity-70 disabled:cursor-not-allowed">
+              {createUserMutation.isPending ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
               ) : (
                 <Save size={16} className="mr-2" />

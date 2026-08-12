@@ -12,8 +12,14 @@ import ac.suza.ims.exception.DuplicateResourceException;
 import ac.suza.ims.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import jakarta.persistence.criteria.Join;
 
 import java.util.HashSet;
 import java.util.List;
@@ -32,11 +38,34 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserResponse> getAllUsers() {
-        log.info("Fetching all users");
-        return userRepository.findAll().stream()
-                .map(userMapper::toResponse)
-                .collect(Collectors.toList());
+    public Page<UserResponse> getAllUsers(String search, UUID roleId, Boolean enabled, Pageable pageable) {
+        log.info("Fetching all users with pagination and filters");
+
+        Specification<User> spec = (root, query, cb) -> {
+            var predicates = cb.conjunction();
+
+            if (StringUtils.hasText(search)) {
+                String searchPattern = "%" + search.toLowerCase() + "%";
+                predicates = cb.and(predicates, cb.or(
+                        cb.like(cb.lower(root.get("firstName")), searchPattern),
+                        cb.like(cb.lower(root.get("lastName")), searchPattern),
+                        cb.like(cb.lower(root.get("email")), searchPattern)
+                ));
+            }
+
+            if (roleId != null) {
+                Join<User, Role> rolesJoin = root.join("roles");
+                predicates = cb.and(predicates, cb.equal(rolesJoin.get("id"), roleId));
+            }
+
+            if (enabled != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("enabled"), enabled));
+            }
+
+            return predicates;
+        };
+
+        return userRepository.findAll(spec, pageable).map(userMapper::toResponse);
     }
 
     @Override

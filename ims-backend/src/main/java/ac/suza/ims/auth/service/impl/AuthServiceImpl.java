@@ -46,10 +46,6 @@ public class AuthServiceImpl implements AuthService {
             throw new DuplicateResourceException("Email already in use: " + request.getEmail());
         }
 
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new DuplicateResourceException("Username already in use: " + request.getUsername());
-        }
-
         User user = userMapper.toEntity(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         
@@ -141,6 +137,35 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new UnauthorizedException("User not found"));
 
         return userMapper.toResponse(user);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse updateMe(UserRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new UnauthorizedException("Not authenticated");
+        }
+
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
+
+        if (!user.getEmail().equals(request.getEmail()) && userRepository.existsByEmail(request.getEmail())) {
+            throw new DuplicateResourceException("Email already in use: " + request.getEmail());
+        }
+
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        if (request.getMiddleName() != null) user.setMiddleName(request.getMiddleName());
+        user.setEmail(request.getEmail());
+        if (request.getPhoneNumber() != null) user.setPhoneNumber(request.getPhoneNumber());
+        if (request.getGender() != null) user.setGender(request.getGender());
+        if (request.getProfilePhoto() != null) user.setProfilePhoto(request.getProfilePhoto());
+
+        User savedUser = userRepository.save(user);
+        return userMapper.toResponse(savedUser);
     }
 
     @Override

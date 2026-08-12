@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Link } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import { authService } from '@/services/auth/auth.service';
 import { EmailInput } from '@/components/auth/EmailInput';
 import { LoadingButton } from '@/components/auth/LoadingButton';
 import { SuccessMessage } from '@/components/auth/SuccessMessage';
@@ -18,7 +20,8 @@ const forgotSchema = z.object({
 type ForgotFormValues = z.infer<typeof forgotSchema>;
 
 export const ForgotPassword = () => {
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const {
     register,
@@ -28,11 +31,19 @@ export const ForgotPassword = () => {
     resolver: zodResolver(forgotSchema),
   });
 
+  const forgotMutation = useMutation({
+    mutationFn: (data: ForgotFormValues) => authService.forgotPassword(data.email),
+    onSuccess: () => {
+      setIsSuccess(true);
+      setErrorMsg(null);
+    },
+    onError: (err: any) => {
+      setErrorMsg(err?.response?.data?.message || err?.response?.data?.error || 'Failed to send reset link. Please try again.');
+    }
+  });
+
   const onSubmit = (data: ForgotFormValues) => {
-    setStatus('loading');
-    setTimeout(() => {
-      setStatus('success');
-    }, 1500);
+    forgotMutation.mutate(data);
   };
 
   return (
@@ -61,7 +72,7 @@ export const ForgotPassword = () => {
         </div>
 
         <AnimatePresence mode="wait">
-          {status === 'success' ? (
+          {isSuccess ? (
             <motion.div
               key="success"
               initial={{ opacity: 0, scale: 0.9 }}
@@ -90,9 +101,15 @@ export const ForgotPassword = () => {
                 placeholder="Enter your email address"
               />
 
+              {errorMsg && (
+                <div className="text-red-500 text-sm font-medium mt-2">
+                  {errorMsg}
+                </div>
+              )}
+
               <LoadingButton
                 type="submit"
-                loading={status === 'loading'}
+                loading={forgotMutation.isPending}
                 className="mt-2"
               >
                 Reset Password

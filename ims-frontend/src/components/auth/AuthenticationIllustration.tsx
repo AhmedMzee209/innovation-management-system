@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import suzaLogo from '@/assets/images/suza-logo.png';
 
 export const AuthenticationIllustration = () => {
   return (
@@ -28,9 +29,9 @@ export const AuthenticationIllustration = () => {
           transition={{ delay: 0.2 }}
           className="flex items-center space-x-3"
         >
-          {/* Logo Placeholder (Replace with actual SUZA/IMS logo if needed) */}
-          <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center font-black text-[#0d2137] shadow-lg">
-            IMS
+          {/* SUZA Logo */}
+          <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg overflow-hidden shrink-0">
+            <img src={suzaLogo} alt="SUZA" className="w-11 h-11 object-contain" />
           </div>
           <span className="text-white font-bold text-xl tracking-wide">SUZA Innovation</span>
         </motion.div>

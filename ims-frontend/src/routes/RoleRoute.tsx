@@ -8,13 +8,13 @@ interface RoleRouteProps {
 }
 
 export const RoleRoute = ({ allowedRoles }: RoleRouteProps) => {
-  const { roles, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   if (!isAuthenticated) {
     return <Navigate to={ROUTES.PUBLIC.LOGIN} replace />;
   }
 
-  const hasRole = roles.some((role) => allowedRoles.includes(role));
+  const hasRole = user?.role ? allowedRoles.includes(user.role) : false;
 
   if (!hasRole) {
     return <Navigate to={ROUTES.ERRORS.FORBIDDEN} replace />;

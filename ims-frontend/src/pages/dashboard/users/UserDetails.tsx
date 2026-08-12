@@ -1,13 +1,32 @@
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Edit, Mail, Phone, Building2, Calendar, Shield, Activity, GraduationCap } from 'lucide-react';
+import { ArrowLeft, Edit, Mail, Phone, Building2, Calendar, Shield, Activity, GraduationCap, Loader2 } from 'lucide-react';
 import { UserAvatar } from '@/components/dashboard/users/UserAvatar';
 import { StatusBadge } from '@/components/dashboard/users/StatusBadge';
 import { RoleBadge } from '@/components/dashboard/users/RoleBadge';
-import { MOCK_USERS } from '@/data/mockUsers';
+import { useQuery } from '@tanstack/react-query';
+import { userService } from '@/services/api/userService';
 
 export const UserDetails = () => {
   const { id } = useParams();
-  const user = MOCK_USERS.find(u => u.id === id) || MOCK_USERS[0];
+  
+  const { data: user, isLoading, isError } = useQuery({
+    queryKey: ['user', id],
+    queryFn: () => userService.getUserById(id!),
+    enabled: !!id,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24">
+        <Loader2 size={40} className="text-[#0098c8] animate-spin mb-4" />
+        <p className="text-gray-500">Loading user details...</p>
+      </div>
+    );
+  }
+
+  if (isError || !user) {
+    return <div className="text-center py-24 text-red-500">User not found.</div>;
+  }
 
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-5xl mx-auto space-y-6">
@@ -32,7 +51,7 @@ export const UserDetails = () => {
             <div className="px-6 pb-6 relative">
               <div className="absolute -top-12">
                 <div className="p-1.5 bg-white dark:bg-gray-900 rounded-full">
-                  <UserAvatar firstName={user.firstName} lastName={user.lastName} imageUrl={user.avatarUrl} size="xl" status={user.status} />
+                  <UserAvatar firstName={user.firstName} lastName={user.lastName} imageUrl={user.profilePhoto} size="xl" />
                 </div>
               </div>
               <div className="pt-16">
@@ -40,8 +59,8 @@ export const UserDetails = () => {
                 <p className="text-sm text-gray-500 mb-4">{user.email}</p>
                 
                 <div className="flex flex-wrap gap-2 mb-6">
-                  <RoleBadge roleId={user.role} />
-                  <StatusBadge status={user.status} />
+                  <RoleBadge roleId={user.roles?.[0]?.name.replace('ROLE_', '').replace(/_/g, ' ') || 'No Role'} />
+                  <StatusBadge status={user.enabled ? 'Active' : 'Inactive'} />
                 </div>
 
                 <div className="space-y-4">
@@ -51,15 +70,15 @@ export const UserDetails = () => {
                   </div>
                   <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                     <Phone size={16} className="mr-3 text-gray-400" />
-                    {user.phone}
+                    {user.phoneNumber || 'Not provided'}
                   </div>
                   <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                     <Building2 size={16} className="mr-3 text-gray-400" />
-                    {user.school}
+                    SUZA
                   </div>
                   <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                     <GraduationCap size={16} className="mr-3 text-gray-400" />
-                    {user.department}
+                    N/A
                   </div>
                   <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                     <Calendar size={16} className="mr-3 text-gray-400" />

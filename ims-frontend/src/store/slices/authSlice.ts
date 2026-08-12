@@ -1,5 +1,32 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { UserProfile } from '@/types/auth';
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+import { UserProfile, UserResponse } from '@/types/auth';
+import { authService } from '@/services/auth/auth.service';
+
+export const mapUserResponseToProfile = (user: UserResponse): UserProfile => {
+  return {
+    id: user.id,
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    phoneNumber: user.phoneNumber,
+    // Safely get the first role or default to 'STUDENT'
+    role: user.roles && user.roles.length > 0 ? user.roles[0].name : 'STUDENT',
+    avatar: user.profilePhoto || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=random`,
+  };
+};
+
+export const restoreSession = createAsyncThunk('auth/restoreSession', async (_, { rejectWithValue }) => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('No token found');
+    const response = await authService.getCurrentUser();
+    return { user: mapUserResponseToProfile(response.data as any), token };
+  } catch (error: any) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    return rejectWithValue(error.response?.data?.message || 'Session expired');
+  }
+});
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -11,12 +38,12 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  isAuthenticated: false,
+  isAuthenticated: !!localStorage.getItem('token'),
   user: null,
   status: 'idle',
   error: null,
-  rememberMe: false,
-  token: null,
+  rememberMe: localStorage.getItem('rememberMe') === 'true',
+  token: localStorage.getItem('token'),
 };
 
 const authSlice = createSlice({
@@ -52,6 +79,24 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(restoreSession.pending, (state) => {
+      state.status = 'loading';
+    });
+    builder.addCase(restoreSession.fulfilled, (state, action) => {
+      state.status = 'success';
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+      state.isAuthenticated = true;
+    });
+    builder.addCase(restoreSession.rejected, (state, action) => {
+      state.status = 'failed';
+      state.user = null;
+      state.token = null;
+      state.isAuthenticated = false;
+      state.error = action.payload as string;
+    });
   },
 });
 

@@ -1,8 +1,11 @@
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useLanguage } from '@/context/LanguageContext';
 
 export const CallToAction = () => {
+  const { t } = useLanguage();
+
   return (
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -18,10 +21,10 @@ export const CallToAction = () => {
 
           <div className="px-8 py-14 text-center relative z-10">
             <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
-              Ready to Shape the Future of Innovation?
+              {t.ctaTitle}
             </h2>
             <p className="text-blue-100 text-base mb-10 max-w-2xl mx-auto">
-              Join the SUZA Innovation Management System today and turn your groundbreaking ideas into reality. Open to all innovators, researchers, and faculty.
+              {t.ctaSubtitle}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
               <Link
@@ -31,13 +34,13 @@ export const CallToAction = () => {
                 onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#c99a00')}
                 onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#e8b800')}
               >
-                Create an Account <ArrowRight size={16} className="ml-2" />
+                {t.ctaButton} <ArrowRight size={16} className="ml-2" />
               </Link>
               <Link
                 to="/login"
                 className="flex items-center px-8 py-3.5 font-bold rounded-lg text-sm text-white transition-all border border-white/30 hover:bg-white/10"
               >
-                Sign In to Dashboard
+                {t.ctaLearn}
               </Link>
             </div>
           </div>

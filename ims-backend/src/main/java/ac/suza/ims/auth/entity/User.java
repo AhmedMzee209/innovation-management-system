@@ -22,7 +22,6 @@ import java.util.Set;
 @Table(
         name = "users",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_users_username", columnNames = "username"),
                 @UniqueConstraint(name = "uk_users_email", columnNames = "email")
         }
 )
@@ -49,11 +48,6 @@ public class User extends BaseEntity {
     @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
 
-    @NotBlank(message = "Username is mandatory")
-    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
-    @Column(nullable = false, unique = true, length = 50)
-    private String username;
-
     @NotBlank(message = "Email is mandatory")
     @Email(message = "Email must be well-formed")
     @Size(max = 100, message = "Email must not exceed 100 characters")
@@ -75,7 +69,7 @@ public class User extends BaseEntity {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    @Column(name = "profile_photo")
+    @Column(name = "profile_photo", columnDefinition = "TEXT")
     private String profilePhoto;
 
     @Column(nullable = false)

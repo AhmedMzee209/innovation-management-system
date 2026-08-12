@@ -77,9 +77,9 @@ public class RoleServiceImpl implements RoleService {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + id));
 
-        // Prevent modifying system roles
-        if (role.isSystemRole()) {
-            throw new BusinessException("Cannot modify a system-defined role.");
+        // Prevent renaming system roles
+        if (role.isSystemRole() && !role.getName().equals(request.getName())) {
+            throw new BusinessException("Cannot change the name of a system-defined role.");
         }
 
         if (!role.getName().equals(request.getName()) && roleRepository.existsByName(request.getName())) {

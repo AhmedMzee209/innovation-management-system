@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import { authService } from '@/services/auth/auth.service';
 import { PasswordInput } from '@/components/auth/PasswordInput';
 import { LoadingButton } from '@/components/auth/LoadingButton';
 import { PasswordStrength } from '@/components/auth/PasswordStrength';
@@ -22,8 +24,11 @@ const resetSchema = z.object({
 type ResetFormValues = z.infer<typeof resetSchema>;
 
 export const ResetPassword = () => {
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
 
   const {
     register,
@@ -36,12 +41,20 @@ export const ResetPassword = () => {
 
   const currentPassword = watch('password', '');
 
-  const onSubmit = (data: ResetFormValues) => {
-    setStatus('loading');
-    setTimeout(() => {
-      setStatus('success');
+  const resetMutation = useMutation({
+    mutationFn: (data: ResetFormValues) => authService.resetPassword({ token, password: data.password }),
+    onSuccess: () => {
+      setIsSuccess(true);
+      setErrorMsg(null);
       setTimeout(() => navigate('/login'), 2000);
-    }, 1500);
+    },
+    onError: (err: any) => {
+      setErrorMsg(err?.response?.data?.message || err?.response?.data?.error || 'Failed to reset password. The link might be expired.');
+    }
+  });
+
+  const onSubmit = (data: ResetFormValues) => {
+    resetMutation.mutate(data);
   };
 
   return (
@@ -62,7 +75,7 @@ export const ResetPassword = () => {
       </div>
 
       <AnimatePresence mode="wait">
-        {status === 'success' ? (
+        {isSuccess ? (
           <motion.div
             key="success"
             initial={{ opacity: 0, scale: 0.9 }}
@@ -97,9 +110,15 @@ export const ResetPassword = () => {
               placeholder="Confirm your new password"
             />
 
+            {errorMsg && (
+              <div className="text-red-500 text-sm font-medium mt-2">
+                {errorMsg}
+              </div>
+            )}
+
             <LoadingButton
               type="submit"
-              loading={status === 'loading'}
+              loading={resetMutation.isPending}
               className="mt-6"
             >
               Reset Password
