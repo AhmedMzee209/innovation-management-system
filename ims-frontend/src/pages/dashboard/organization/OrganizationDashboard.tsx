@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Building2, BookOpen, Globe, Users, ChevronDown, ChevronRight, LayoutDashboard } from 'lucide-react';
-import { MOCK_SCHOOLS, MOCK_DEPARTMENTS, MOCK_HUBS, MOCK_MANAGERS } from '@/data/mockOrganization';
+import { Building2, BookOpen, Globe, Users, ChevronDown, ChevronRight, LayoutDashboard, Loader2 } from 'lucide-react';
+import { useSchools, useDepartments, useInnovationHubs } from '@/hooks/useOrganization';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 
@@ -50,7 +50,20 @@ const TreeNode = ({ label, icon: Icon, children, defaultExpanded = false, colorC
 };
 
 export const OrganizationDashboard = () => {
-  const centralHub = MOCK_HUBS.find(h => h.type === 'Central');
+  const { data: schools = [], isLoading: isLoadingSchools } = useSchools();
+  const { data: departments = [], isLoading: isLoadingDepts } = useDepartments();
+  const { data: hubs = [], isLoading: isLoadingHubs } = useInnovationHubs();
+
+  const isLoading = isLoadingSchools || isLoadingDepts || isLoadingHubs;
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24">
+        <Loader2 size={40} className="animate-spin text-[#0098c8] mb-3" />
+        <p className="text-sm text-gray-500 font-medium">Loading organization ecosystem hierarchy...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
@@ -80,7 +93,7 @@ export const OrganizationDashboard = () => {
                   </div>
                   <span className="font-medium text-gray-900 dark:text-white">Schools</span>
                 </div>
-                <span className="text-xl font-black">{MOCK_SCHOOLS.length}</span>
+                <span className="text-xl font-black">{schools.length}</span>
               </div>
               
               <div className="flex items-center justify-between">
@@ -90,7 +103,7 @@ export const OrganizationDashboard = () => {
                   </div>
                   <span className="font-medium text-gray-900 dark:text-white">Departments</span>
                 </div>
-                <span className="text-xl font-black">{MOCK_DEPARTMENTS.length}</span>
+                <span className="text-xl font-black">{departments.length}</span>
               </div>
               
               <div className="flex items-center justify-between">
@@ -100,17 +113,7 @@ export const OrganizationDashboard = () => {
                   </div>
                   <span className="font-medium text-gray-900 dark:text-white">Innovation Hubs</span>
                 </div>
-                <span className="text-xl font-black">{MOCK_HUBS.length}</span>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 flex items-center justify-center mr-3">
-                    <Users size={20} />
-                  </div>
-                  <span className="font-medium text-gray-900 dark:text-white">Hub Managers</span>
-                </div>
-                <span className="text-xl font-black">{MOCK_MANAGERS.length}</span>
+                <span className="text-xl font-black">{hubs.length}</span>
               </div>
             </div>
           </div>
@@ -125,31 +128,24 @@ export const OrganizationDashboard = () => {
               <div className="min-w-[400px]">
                 <TreeNode label="State University of Zanzibar (SUZA)" icon={Building2} colorClass="text-yellow-600" defaultExpanded>
                   
-                  {centralHub && (
-                    <TreeNode label={centralHub.name} icon={Globe} colorClass="text-purple-600" link={`/dashboard/hubs/${centralHub.id}`}>
-                      {MOCK_MANAGERS.filter(m => m.hubId === centralHub.id).map(mgr => (
-                        <TreeNode key={mgr.id} label={`${mgr.firstName} ${mgr.lastName} (Manager)`} icon={Users} colorClass="text-emerald-600" link={`/dashboard/managers/${mgr.id}`} />
-                      ))}
-                    </TreeNode>
-                  )}
-                  
-                  {MOCK_SCHOOLS.map(school => (
-                    <TreeNode key={school.id} label={school.name} icon={Building2} colorClass="text-blue-600" link={`/dashboard/schools/${school.id}`}>
-                      
-                      {MOCK_HUBS.filter(h => h.schoolId === school.id).map(hub => (
-                        <TreeNode key={hub.id} label={hub.name} icon={Globe} colorClass="text-purple-500" link={`/dashboard/hubs/${hub.id}`}>
-                          {MOCK_MANAGERS.filter(m => m.hubId === hub.id).map(mgr => (
-                            <TreeNode key={mgr.id} label={`${mgr.firstName} ${mgr.lastName} (Manager)`} icon={Users} colorClass="text-emerald-500" link={`/dashboard/managers/${mgr.id}`} />
-                          ))}
-                        </TreeNode>
-                      ))}
+                  {schools.map(school => {
+                    const schoolDepts = departments.filter(d => d.school?.id === school.id);
+                    const schoolHubs = hubs.filter(h => h.school?.id === school.id);
 
-                      {MOCK_DEPARTMENTS.filter(d => d.schoolId === school.id).map(dept => (
-                        <TreeNode key={dept.id} label={dept.name} icon={BookOpen} colorClass="text-indigo-500" />
-                      ))}
+                    return (
+                      <TreeNode key={school.id} label={`${school.name} (${school.code})`} icon={Building2} colorClass="text-blue-600" link={`/dashboard/schools/${school.id}`}>
+                        
+                        {schoolHubs.map(hub => (
+                          <TreeNode key={hub.id} label={`${hub.name} (${hub.code})`} icon={Globe} colorClass="text-purple-500" link={`/dashboard/hubs/${hub.id}`} />
+                        ))}
 
-                    </TreeNode>
-                  ))}
+                        {schoolDepts.map(dept => (
+                          <TreeNode key={dept.id} label={`${dept.name} (${dept.code})`} icon={BookOpen} colorClass="text-indigo-500" />
+                        ))}
+
+                      </TreeNode>
+                    );
+                  })}
                   
                 </TreeNode>
               </div>

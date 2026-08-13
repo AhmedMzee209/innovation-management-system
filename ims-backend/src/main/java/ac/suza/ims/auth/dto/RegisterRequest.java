@@ -1,6 +1,7 @@
 package ac.suza.ims.auth.dto;
 
 import ac.suza.ims.auth.entity.Gender;
+import ac.suza.ims.auth.entity.UserType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -41,4 +42,10 @@ public class RegisterRequest {
     private String phoneNumber;
 
     private Gender gender;
+
+    private UserType userType;
+
+    private String registrationNumber;
+
+    private Integer graduationYear;
 }

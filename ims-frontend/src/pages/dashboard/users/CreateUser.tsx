@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useForm as useRHF } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -20,12 +21,26 @@ const schema = z.object({
   department: z.string().optional(),
   hub: z.string().optional(),
   employeeId: z.string().optional(),
-  status: z.enum(['Active', 'Inactive', 'Pending', 'Suspended']),
+  userType: z.enum(['STUDENT', 'ALUMNI', 'EXTERNAL']).optional(),
+  registrationNumber: z.string().optional(),
+  graduationYear: z.string().optional(),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
+}).refine((data) => {
+  if (data.userType === 'STUDENT' && !data.registrationNumber) return false;
+  return true;
+}, {
+  message: "Registration number is required for students",
+  path: ["registrationNumber"],
+}).refine((data) => {
+  if (data.userType === 'ALUMNI' && !data.graduationYear) return false;
+  return true;
+}, {
+  message: "Graduation year is required for alumni",
+  path: ["graduationYear"],
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -40,13 +55,16 @@ export const CreateUser = () => {
     queryFn: () => rbacService.getRoles(),
   });
 
-  const { register, handleSubmit, formState: { errors } } = useRHF<FormValues>({
+  const { register, handleSubmit, watch, formState: { errors } } = useRHF<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       status: 'Active',
-      gender: 'MALE'
+      gender: 'MALE',
+      userType: 'STUDENT'
     }
   });
+
+  const selectedUserType = watch('userType');
 
   const createUserMutation = useMutation({
     mutationFn: async (data: FormValues) => {
@@ -58,6 +76,9 @@ export const CreateUser = () => {
         phoneNumber: data.phoneNumber,
         password: data.password,
         gender: data.gender as any,
+        userType: data.userType as any,
+        registrationNumber: data.registrationNumber,
+        graduationYear: data.graduationYear ? parseInt(data.graduationYear, 10) : undefined,
       });
 
       const userId = authRes.user.id;
@@ -69,6 +90,9 @@ export const CreateUser = () => {
         email: data.email,
         phoneNumber: data.phoneNumber,
         gender: data.gender,
+        userType: data.userType as any,
+        registrationNumber: data.registrationNumber,
+        graduationYear: data.graduationYear ? parseInt(data.graduationYear, 10) : undefined,
         roleIds: [data.role],
         enabled: data.status === 'Active'
       });
@@ -202,6 +226,31 @@ export const CreateUser = () => {
                   <option value="OTHER">Other</option>
                 </select>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">User Category</label>
+                <select {...register('userType')} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] bg-white dark:bg-gray-900 dark:text-white">
+                  <option value="STUDENT">Student</option>
+                  <option value="ALUMNI">Alumni</option>
+                  <option value="EXTERNAL">External / Other</option>
+                </select>
+              </div>
+
+              {selectedUserType === 'STUDENT' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Registration Number <span className="text-red-500">*</span></label>
+                  <input {...register('registrationNumber')} placeholder="e.g. 2024-00123" className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] bg-white dark:bg-gray-900 dark:text-white" />
+                  {errors.registrationNumber && <p className="text-red-500 text-xs mt-1">{errors.registrationNumber.message}</p>}
+                </div>
+              )}
+
+              {selectedUserType === 'ALUMNI' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Graduation Year <span className="text-red-500">*</span></label>
+                  <input {...register('graduationYear')} type="number" placeholder="e.g. 2022" className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] bg-white dark:bg-gray-900 dark:text-white" />
+                  {errors.graduationYear && <p className="text-red-500 text-xs mt-1">{errors.graduationYear.message}</p>}
+                </div>
+              )}
             </div>
           </div>
 
@@ -219,7 +268,7 @@ export const CreateUser = () => {
                   <Shield className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                   <select {...register('role')} className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] bg-white dark:bg-gray-900 dark:text-white">
                     <option value="">Select a role...</option>
-                    {roles?.map(r => <option key={r.id} value={r.id}>{r.name.replace('ROLE_', '').replace(/_/g, ' ')}</option>)}
+                    {roles?.filter(r => r.name !== ('ROLE_STUDENT' as any) && r.name !== ('ROLE_ALUMNI' as any)).map(r => <option key={r.id} value={r.id}>{r.name.replace('ROLE_', '').replace(/_/g, ' ')}</option>)}
                   </select>
                 </div>
                 {errors.role && <p className="text-red-500 text-xs mt-1">{errors.role.message}</p>}

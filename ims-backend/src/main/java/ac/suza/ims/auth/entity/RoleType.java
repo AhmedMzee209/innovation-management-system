@@ -7,8 +7,7 @@ public enum RoleType {
     SCHOOL_INNOVATION_MANAGER,
     MENTOR,
     REVIEWER,
-    STUDENT,
-    ALUMNI,
+    INNOVATOR,
     INVESTOR,
     PUBLIC_VISITOR
 }

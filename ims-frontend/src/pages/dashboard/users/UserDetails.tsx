@@ -76,13 +76,17 @@ export const UserDetails = () => {
                     <Building2 size={16} className="mr-3 text-gray-400" />
                     SUZA
                   </div>
-                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                    <GraduationCap size={16} className="mr-3 text-gray-400" />
-                    N/A
-                  </div>
+                  {user.userType && (
+                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                      <GraduationCap size={16} className="mr-3 text-gray-400" />
+                      {user.userType === 'STUDENT' && `Student (Reg: ${user.registrationNumber || 'N/A'})`}
+                      {user.userType === 'ALUMNI' && `Alumni (Class of ${user.graduationYear || 'N/A'})`}
+                      {user.userType === 'EXTERNAL' && 'External Innovator'}
+                    </div>
+                  )}
                   <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                     <Calendar size={16} className="mr-3 text-gray-400" />
-                    Joined {new Date(user.createdAt).toLocaleDateString()}
+                    Joined {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Recently'}
                   </div>
                 </div>
               </div>

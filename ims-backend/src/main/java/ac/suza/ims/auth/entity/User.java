@@ -72,6 +72,16 @@ public class User extends BaseEntity {
     @Column(name = "profile_photo", columnDefinition = "TEXT")
     private String profilePhoto;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_type", length = 20)
+    private UserType userType;
+
+    @Column(name = "registration_number", length = 50)
+    private String registrationNumber;
+
+    @Column(name = "graduation_year")
+    private Integer graduationYear;
+
     @Column(nullable = false)
     @Builder.Default
     private boolean enabled = true;

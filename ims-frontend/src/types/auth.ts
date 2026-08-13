@@ -5,8 +5,7 @@ export type Role =
   | 'SCHOOL_HUB_MANAGER'
   | 'MENTOR'
   | 'REVIEWER'
-  | 'INNOVATOR'
-  | 'STUDENT';
+  | 'INNOVATOR';
 
 export interface UserProfile {
   id: string;
@@ -34,6 +33,9 @@ export interface UserResponse {
   email: string;
   phoneNumber?: string;
   gender?: string;
+  userType?: 'STUDENT' | 'ALUMNI' | 'EXTERNAL';
+  registrationNumber?: string;
+  graduationYear?: number;
   profilePhoto?: string;
   enabled: boolean;
   emailVerified: boolean;

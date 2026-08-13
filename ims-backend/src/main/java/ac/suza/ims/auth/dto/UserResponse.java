@@ -1,6 +1,7 @@
 package ac.suza.ims.auth.dto;
 
 import ac.suza.ims.auth.entity.Gender;
+import ac.suza.ims.auth.entity.UserType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,6 +29,12 @@ public class UserResponse {
     private String phoneNumber;
 
     private Gender gender;
+
+    private UserType userType;
+
+    private String registrationNumber;
+
+    private Integer graduationYear;
 
     private String profilePhoto;
 

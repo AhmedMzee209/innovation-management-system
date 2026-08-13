@@ -194,7 +194,7 @@ export const EditUser = () => {
                 <div>
                   <select {...register('roleId')} className="w-full max-w-md px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] bg-white dark:bg-gray-900 dark:text-white">
                     <option value="">Select a role...</option>
-                    {roles?.map(r => (
+                    {roles?.filter(r => r.name !== ('ROLE_STUDENT' as any) && r.name !== ('ROLE_ALUMNI' as any)).map(r => (
                       <option key={r.id} value={r.id}>{r.name.replace('ROLE_', '').replace(/_/g, ' ')}</option>
                     ))}
                   </select>

@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { useMutation } from '@tanstack/react-query';
 import { authService } from '@/services/auth/auth.service';
 import Swal from 'sweetalert2';
+import { CalendarDays, Hash } from 'lucide-react';
 
 // ─── Validation Schema (mirrors backend RegisterRequest) ─────
 const registerSchema = z.object({
@@ -21,6 +22,9 @@ const registerSchema = z.object({
   email: z.string().email('Enter a valid email address').max(100),
   phoneNumber: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Enter a valid phone number (e.g. +255712345678)').optional().or(z.literal('')),
   gender: z.enum(['MALE', 'FEMALE', 'OTHER', '']).optional(),
+  userType: z.enum(['STUDENT', 'ALUMNI', 'EXTERNAL', '']),
+  registrationNumber: z.string().optional(),
+  graduationYear: z.string().optional(),
   password: z.string()
     .min(8, 'Minimum 8 characters')
     .regex(/(?=.*[0-9])/, 'Must contain a number')
@@ -31,6 +35,18 @@ const registerSchema = z.object({
 }).refine(d => d.password === d.confirmPassword, {
   message: "Passwords don't match",
   path: ['confirmPassword'],
+}).refine(d => {
+  if (d.userType === 'STUDENT' && !d.registrationNumber) return false;
+  return true;
+}, {
+  message: "Registration number is required for students",
+  path: ['registrationNumber']
+}).refine(d => {
+  if (d.userType === 'ALUMNI' && !d.graduationYear) return false;
+  return true;
+}, {
+  message: "Graduation year is required for alumni",
+  path: ['graduationYear']
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -95,10 +111,11 @@ export const RegisterForm = () => {
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { gender: '' },
+    defaultValues: { gender: '', userType: 'STUDENT' },
   });
 
   const password = watch('password') ?? '';
+  const userType = watch('userType');
 
   const registerMutation = useMutation({
     mutationFn: (payload: any) => authService.register(payload),
@@ -142,6 +159,9 @@ export const RegisterForm = () => {
       password: data.password,
       phoneNumber: data.phoneNumber || undefined,
       gender: data.gender || undefined,
+      userType: data.userType || undefined,
+      registrationNumber: data.registrationNumber || undefined,
+      graduationYear: data.graduationYear ? parseInt(data.graduationYear, 10) : undefined,
     };
 
     registerMutation.mutate(payload);
@@ -202,6 +222,43 @@ export const RegisterForm = () => {
           </div>
         </Field>
       </div>
+
+      {/* User Type Row */}
+      <Field label="I am registering as *" error={errors.userType?.message}>
+        <div className="relative">
+          <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          <select {...register('userType')} className={`${inputClass} pl-4 pr-8 appearance-none`}>
+            <option value="STUDENT">Current Student</option>
+            <option value="ALUMNI">Alumni</option>
+            <option value="EXTERNAL">External Innovator / Other</option>
+          </select>
+        </div>
+      </Field>
+
+      {/* Conditional Fields based on User Type */}
+      <AnimatePresence>
+        {userType === 'STUDENT' && (
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
+            <Field label="Registration Number *" error={errors.registrationNumber?.message}>
+              <div className="relative mt-1 mb-2">
+                <Hash size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input {...register('registrationNumber')} placeholder="e.g. 2024-00123" className={inputClass} />
+              </div>
+            </Field>
+          </motion.div>
+        )}
+        
+        {userType === 'ALUMNI' && (
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
+            <Field label="Graduation Year *" error={errors.graduationYear?.message}>
+              <div className="relative mt-1 mb-2">
+                <CalendarDays size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input {...register('graduationYear')} type="number" placeholder="e.g. 2022" min="1990" max="2030" className={inputClass} />
+              </div>
+            </Field>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Password */}
       <Field label="Password *" error={errors.password?.message}>
