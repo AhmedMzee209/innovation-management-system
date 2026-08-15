@@ -3,7 +3,7 @@ import { StatCard } from '@/components/dashboard/widgets/StatCard';
 import { MOCK_FUNDING_PROGRAMS, MOCK_APPLICATIONS, MOCK_DISBURSEMENTS } from '@/data/mockFunding';
 import { Link } from 'react-router-dom';
 import { ApplicationCard } from '@/components/dashboard/funding/cards/ApplicationCard';
-import { AppStatusBadge, DisbursementStatusBadge } from '@/components/dashboard/funding/cards/FundingStatusBadge';
+import { DisbursementStatusBadge } from '@/components/dashboard/funding/cards/FundingStatusBadge';
 import { format, parseISO } from 'date-fns';
 
 export const FundingDashboard = () => {

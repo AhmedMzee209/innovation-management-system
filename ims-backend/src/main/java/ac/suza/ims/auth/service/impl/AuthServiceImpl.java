@@ -162,6 +162,7 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(request.getEmail());
         if (request.getPhoneNumber() != null) user.setPhoneNumber(request.getPhoneNumber());
         if (request.getGender() != null) user.setGender(request.getGender());
+        if (request.getDateOfBirth() != null) user.setDateOfBirth(request.getDateOfBirth());
         if (request.getProfilePhoto() != null) user.setProfilePhoto(request.getProfilePhoto());
 
         User savedUser = userRepository.save(user);

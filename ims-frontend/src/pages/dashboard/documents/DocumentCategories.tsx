@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { DOCUMENT_CATEGORIES, MOCK_DOCUMENTS } from '@/data/mockDocuments';
-import { Layers, Search, FileText, ArrowRight, FileArchive, Briefcase, Presentation, BookOpen, PieChart, PenTool, Award, Image, Video, File } from 'lucide-react';
+import { Layers, Search, FileText, ArrowRight, Briefcase, Presentation, BookOpen, PieChart, PenTool, Award, Image, Video, File } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const getCategoryIcon = (iconName: string) => {

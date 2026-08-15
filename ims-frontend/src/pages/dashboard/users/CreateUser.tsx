@@ -81,7 +81,7 @@ export const CreateUser = () => {
         graduationYear: data.graduationYear ? parseInt(data.graduationYear, 10) : undefined,
       });
 
-      const userId = authRes.user.id;
+      const userId = authRes.data.user.id;
 
       // 2. Update their role, status and other fields
       await userService.updateUser(userId, {
@@ -268,7 +268,7 @@ export const CreateUser = () => {
                   <Shield className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                   <select {...register('role')} className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] bg-white dark:bg-gray-900 dark:text-white">
                     <option value="">Select a role...</option>
-                    {roles?.filter(r => r.name !== ('ROLE_STUDENT' as any) && r.name !== ('ROLE_ALUMNI' as any)).map(r => <option key={r.id} value={r.id}>{r.name.replace('ROLE_', '').replace(/_/g, ' ')}</option>)}
+                    {roles?.map(r => <option key={r.id} value={r.id}>{r.name.replace('ROLE_', '').replace(/_/g, ' ')}</option>)}
                   </select>
                 </div>
                 {errors.role && <p className="text-red-500 text-xs mt-1">{errors.role.message}</p>}

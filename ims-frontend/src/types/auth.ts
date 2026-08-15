@@ -16,6 +16,7 @@ export interface UserProfile {
   avatar: string;
   department?: string;
   phoneNumber?: string;
+  roles?: string[];
 }
 
 // Backend Response Types

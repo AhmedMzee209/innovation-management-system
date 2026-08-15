@@ -30,6 +30,8 @@ public class UserResponse {
 
     private Gender gender;
 
+    private java.time.LocalDate dateOfBirth;
+
     private UserType userType;
 
     private String registrationNumber;

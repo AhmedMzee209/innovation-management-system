@@ -40,9 +40,11 @@ export const EditUser = () => {
     if (user) {
       reset({
         firstName: user.firstName,
+        middleName: user.middleName || '',
         lastName: user.lastName,
         email: user.email,
-        phoneNumber: user.phoneNumber,
+        phoneNumber: user.phoneNumber || '',
+        dateOfBirth: user.dateOfBirth || '',
         roleId: user.roles?.[0]?.id || '',
         enabled: user.enabled,
       });
@@ -53,9 +55,11 @@ export const EditUser = () => {
     mutationFn: async (data: any) => {
       return userService.updateUser(id!, {
         firstName: data.firstName,
+        middleName: data.middleName || undefined,
         lastName: data.lastName,
         email: data.email,
-        phoneNumber: data.phoneNumber,
+        phoneNumber: data.phoneNumber || undefined,
+        dateOfBirth: data.dateOfBirth || undefined,
         roleIds: [data.roleId],
         enabled: data.enabled === 'true' || data.enabled === true,
       });
@@ -172,8 +176,16 @@ export const EditUser = () => {
                     <input {...register('firstName')} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] bg-white dark:bg-gray-900 dark:text-white" />
                   </div>
                   <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Middle Name</label>
+                    <input {...register('middleName')} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] bg-white dark:bg-gray-900 dark:text-white" />
+                  </div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
                     <input {...register('lastName')} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] bg-white dark:bg-gray-900 dark:text-white" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date of Birth</label>
+                    <input {...register('dateOfBirth')} type="date" className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] bg-white dark:bg-gray-900 dark:text-white" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
@@ -194,7 +206,7 @@ export const EditUser = () => {
                 <div>
                   <select {...register('roleId')} className="w-full max-w-md px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] bg-white dark:bg-gray-900 dark:text-white">
                     <option value="">Select a role...</option>
-                    {roles?.filter(r => r.name !== ('ROLE_STUDENT' as any) && r.name !== ('ROLE_ALUMNI' as any)).map(r => (
+                    {roles?.map(r => (
                       <option key={r.id} value={r.id}>{r.name.replace('ROLE_', '').replace(/_/g, ' ')}</option>
                     ))}
                   </select>

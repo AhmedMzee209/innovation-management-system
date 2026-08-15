@@ -239,6 +239,7 @@ export const AppRouter = () => {
           <Route path="/dashboard/managers" element={<ManagerList />} />
 
           {/* Innovation Module */}
+          <Route path="/dashboard/innovations/dashboard" element={<InnovationDashboard />} />
           <Route path="/dashboard/innovations" element={<InnovationList />} />
           <Route path="/dashboard/innovations/new" element={<SubmitInnovation />} />
           <Route path="/dashboard/innovations/:id" element={<InnovationDetails />} />

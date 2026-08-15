@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Heart, Eye, ExternalLink } from 'lucide-react';
+import { Heart, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { ShowcaseInnovation } from '@/data/mockShowcase';
 import { CATEGORY_COLORS } from './CategoryFilter';

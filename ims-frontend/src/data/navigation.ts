@@ -74,7 +74,7 @@ export const SIDEBAR_NAVIGATION: NavGroup[] = [
       },
       {
         name: 'Categories',
-        href: '/dashboard/categories',
+        href: '/dashboard/innovations/categories',
         icon: Briefcase,
       }
     ]
@@ -404,6 +404,12 @@ export const SIDEBAR_NAVIGATION: NavGroup[] = [
         name: 'Innovation Hubs',
         href: '/dashboard/organization',
         icon: Globe,
+        roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR'],
+      },
+      {
+        name: 'Innovation Managers',
+        href: '/dashboard/managers',
+        icon: Users,
         roles: ['SUPER_ADMIN', 'INNOVATION_DIRECTOR'],
       }
     ]

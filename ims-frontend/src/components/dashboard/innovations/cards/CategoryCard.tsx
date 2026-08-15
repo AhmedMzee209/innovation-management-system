@@ -1,5 +1,5 @@
 import { InnovationCategory } from '@/data/mockInnovations';
-import { BrainCircuit, Waves, Leaf, HeartPulse, GraduationCap, Briefcase, Palmtree, TreePine, Laptop, Wrench, Microscope, ArrowRight } from 'lucide-react';
+import { BrainCircuit, Waves, Leaf, HeartPulse, GraduationCap, Briefcase, Palmtree, TreePine, Laptop, Wrench, Microscope, ArrowRight, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 
@@ -8,12 +8,12 @@ const IconMap: Record<string, any> = {
 };
 
 interface CategoryCardProps {
-  category: { id: string; icon: string; desc: string };
+  category: { id: string; name: string; description: string; icon?: string };
   count: number;
 }
 
 export const CategoryCard = ({ category, count }: CategoryCardProps) => {
-  const Icon = IconMap[category.icon] || Lightbulb;
+  const Icon = category.icon && IconMap[category.icon] ? IconMap[category.icon] : Lightbulb;
 
   return (
     <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col group h-full relative overflow-hidden">
@@ -28,11 +28,11 @@ export const CategoryCard = ({ category, count }: CategoryCardProps) => {
       </div>
 
       <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2 leading-tight">
-        {category.id}
+        {category.name}
       </h3>
       
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 flex-1 pr-6">
-        {category.desc}
+        {category.description}
       </p>
 
       <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-800 pt-4 mt-auto">
@@ -42,7 +42,7 @@ export const CategoryCard = ({ category, count }: CategoryCardProps) => {
         </div>
         
         <Link 
-          to={`/dashboard/innovations?category=${encodeURIComponent(category.id)}`}
+          to={`/dashboard/innovations?category=${encodeURIComponent(category.name)}`}
           className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400 group-hover:bg-[#0098c8] group-hover:text-white transition-colors"
         >
           <ArrowRight size={16} />

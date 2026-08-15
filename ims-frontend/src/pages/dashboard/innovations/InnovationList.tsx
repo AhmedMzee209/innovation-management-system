@@ -1,16 +1,18 @@
 import { useState } from 'react';
-import { MOCK_INNOVATIONS, Innovation } from '@/data/mockInnovations';
 import { StatusBadge } from '@/components/dashboard/innovations/cards/StatusBadge';
 import { createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, getPaginationRowModel, useReactTable, SortingState } from '@tanstack/react-table';
-import { Search, Filter, Download, Plus, ChevronDown, ChevronUp, MoreHorizontal } from 'lucide-react';
+import { Search, Filter, Download, Plus, ChevronDown, ChevronUp, MoreHorizontal, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
-import { MOCK_SCHOOLS } from '@/data/mockOrganization';
+import { useInnovations, useMyInnovations } from '@/hooks/useInnovation';
+import { InnovationSummary } from '@/services/api/innovationService';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store';
 
-const columnHelper = createColumnHelper<Innovation>();
+const columnHelper = createColumnHelper<InnovationSummary>();
 
 const columns = [
-  columnHelper.accessor('code', {
+  columnHelper.accessor('innovationCode', {
     header: 'Code',
     cell: info => <span className="font-mono text-xs font-bold text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{info.getValue()}</span>,
   }),
@@ -22,31 +24,30 @@ const columns = [
       </Link>
     ),
   }),
-  columnHelper.accessor('categoryId', {
+  columnHelper.accessor('categoryName', {
     header: 'Category',
-    cell: info => <span className="text-sm text-gray-600 dark:text-gray-300">{info.getValue()}</span>,
+    cell: info => <span className="text-sm text-gray-600 dark:text-gray-300">{info.getValue() || 'Uncategorized'}</span>,
   }),
-  columnHelper.accessor('schoolId', {
+  columnHelper.accessor('schoolName', {
     header: 'School',
     cell: info => {
-      const school = MOCK_SCHOOLS.find(s => s.id === info.getValue());
-      return <span className="text-sm text-gray-600 dark:text-gray-300" title={school?.name}>{school?.shortName}</span>;
+      return <span className="text-sm text-gray-600 dark:text-gray-300">{info.getValue() || 'N/A'}</span>;
     },
   }),
-  columnHelper.accessor('stage', {
+  columnHelper.accessor('currentStatus', {
     header: 'Status',
     cell: info => <StatusBadge stage={info.getValue()} />,
   }),
   columnHelper.accessor('submissionDate', {
     header: 'Submitted',
-    cell: info => <span className="text-sm text-gray-500">{format(new Date(info.getValue()), 'MMM d, yyyy')}</span>,
+    cell: info => <span className="text-sm text-gray-500">{info.getValue() ? format(new Date(info.getValue()), 'MMM d, yyyy') : 'N/A'}</span>,
   }),
   columnHelper.display({
     id: 'actions',
-    cell: () => (
-      <button className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+    cell: info => (
+      <Link to={`/dashboard/innovations/${info.row.original.id}`} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors inline-flex">
         <MoreHorizontal size={16} />
-      </button>
+      </Link>
     )
   })
 ];
@@ -55,9 +56,14 @@ export const InnovationList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sorting, setSorting] = useState<SortingState>([]);
   
-  const filteredData = MOCK_INNOVATIONS.filter(inv => 
-    inv.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    inv.code.toLowerCase().includes(searchQuery.toLowerCase())
+  const { user } = useSelector((state: RootState) => state.auth);
+  const isAdmin = user?.roles?.includes('SUPER_ADMIN') || user?.role === 'SUPER_ADMIN' || user?.roles?.includes('INNOVATION_DIRECTOR') || user?.role === 'INNOVATION_DIRECTOR' || user?.roles?.includes('CENTRAL_HUB_MANAGER') || user?.role === 'CENTRAL_HUB_MANAGER';
+
+  const { data: innovations = [], isLoading, isError } = isAdmin ? useInnovations() : useMyInnovations();
+  
+  const filteredData = innovations.filter(inv => 
+    inv.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    inv.innovationCode?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const table = useReactTable({
@@ -70,13 +76,29 @@ export const InnovationList = () => {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Loader2 className="w-8 h-8 text-[#0098c8] animate-spin" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center h-96 text-red-500">
+        Failed to load innovations. Please try again.
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Innovations Directory</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage and track all innovations across the ecosystem.</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{isAdmin ? 'Innovations Directory' : 'My Innovations'}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage and track {isAdmin ? 'all innovations across the ecosystem.' : 'your submitted innovations.'}</p>
         </div>
         <div className="flex items-center space-x-3">
           <button className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm flex items-center">
@@ -94,7 +116,7 @@ export const InnovationList = () => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           <input 
             type="text" 
-            placeholder="Search by ID or Title..." 
+            placeholder="Search by Code or Title..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-gray-50 dark:bg-gray-800/50 focus:outline-none focus:ring-2 focus:ring-[#0098c8] dark:text-white transition-shadow"

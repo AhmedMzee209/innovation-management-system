@@ -65,7 +65,7 @@ public class InnovationController {
     }
 
     @Operation(summary = "Get all innovations (Admin)")
-    @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN') or hasAuthority('INNOVATION_VIEW_ALL')")
+    @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN') or hasAuthority('ROLE_INNOVATION_DIRECTOR') or hasAuthority('ROLE_CENTRAL_INNOVATION_MANAGER') or hasAuthority('INNOVATION_VIEW_ALL')")
     @GetMapping
     public ResponseEntity<ApiResponse<List<InnovationSummaryResponse>>> getAllInnovations() {
         return ResponseEntity.ok(ApiResponse.success("Innovations fetched successfully", 

@@ -11,6 +11,7 @@ export const mapUserResponseToProfile = (user: UserResponse): UserProfile => {
     phoneNumber: user.phoneNumber,
     // Safely get the first role or default to 'INNOVATOR'
     role: user.roles && user.roles.length > 0 ? user.roles[0].name : 'INNOVATOR',
+    roles: user.roles ? user.roles.map(r => r.name) : [],
     avatar: user.profilePhoto || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=random`,
   };
 };
