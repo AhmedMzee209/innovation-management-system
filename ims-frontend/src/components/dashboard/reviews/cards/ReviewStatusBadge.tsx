@@ -1,9 +1,8 @@
-import { ReviewStatus } from '@/data/mockReviews';
 import { cn } from '@/lib/utils';
 import { Clock, PlayCircle, CheckCircle2, AlertCircle } from 'lucide-react';
 
 interface ReviewStatusBadgeProps {
-  status: ReviewStatus;
+  status: string;
   className?: string;
 }
 
@@ -12,14 +11,17 @@ export const ReviewStatusBadge = ({ status, className }: ReviewStatusBadgeProps)
   let Icon = Clock;
 
   switch (status) {
+    case 'PENDING':
     case 'Pending':
       color = 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
       Icon = Clock;
       break;
+    case 'IN_PROGRESS':
     case 'In Progress':
       color = 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
       Icon = PlayCircle;
       break;
+    case 'COMPLETED':
     case 'Evaluated':
       color = 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400';
       Icon = CheckCircle2;

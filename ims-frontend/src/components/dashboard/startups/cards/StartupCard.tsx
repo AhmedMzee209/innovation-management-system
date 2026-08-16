@@ -1,9 +1,9 @@
-import { Startup } from '@/data/mockStartups';
-import { StageBadge, FundingBadge } from './StartupStatusBadge';
+import { StartupSummaryResponse } from '@/services/api/startupService';
+import { StageBadge } from './StartupStatusBadge';
 import { Building2, ArrowRight, Layers, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export const StartupCard = ({ startup }: { startup: Startup }) => {
+export const StartupCard = ({ startup }: { startup: StartupSummaryResponse }) => {
   return (
     <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all flex flex-col group h-full">
       <div className="p-5 flex-1 flex flex-col">
@@ -11,34 +11,33 @@ export const StartupCard = ({ startup }: { startup: Startup }) => {
           <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-sm shrink-0">
             <Building2 size={24} className="text-white" />
           </div>
-          <StageBadge stage={startup.stage} />
+          <StageBadge stage={startup.stageName || 'UNKNOWN'} />
         </div>
 
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white leading-tight mb-1 line-clamp-1" title={startup.name}>
-          {startup.name}
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white leading-tight mb-1 line-clamp-1" title={startup.startupName}>
+          {startup.startupName}
         </h3>
         <p className="text-sm text-gray-500 mb-4 line-clamp-2 min-h-[40px]">
-          {startup.tagline}
+          {startup.tagline || 'No tagline available'}
         </p>
         
         <div className="space-y-2 mb-4 mt-auto">
           <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
             <Layers size={14} className="mr-2 text-gray-400 shrink-0" />
-            <span className="truncate">{startup.industry}</span>
+            <span className="truncate">{startup.schoolName || 'University-wide'}</span>
           </div>
           <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
             <Users size={14} className="mr-2 text-gray-400 shrink-0" />
-            <span className="truncate">{startup.team.length} Team Members</span>
+            <span className="truncate">{startup.hubName || 'No Hub Assigned'}</span>
           </div>
         </div>
 
         <div className="pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
-          <FundingBadge status={startup.fundingStatus} />
-          {startup.totalFundingRaised > 0 && (
-            <span className="text-xs font-bold text-green-600 dark:text-green-500">
-              ${(startup.totalFundingRaised / 1000).toFixed(0)}k Raised
-            </span>
-          )}
+          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize ${
+            startup.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+          }`}>
+            {startup.status?.toLowerCase()}
+          </span>
         </div>
       </div>
 

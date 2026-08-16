@@ -98,10 +98,10 @@ public class ReviewAssignmentServiceImpl implements ReviewAssignmentService {
     @Transactional(readOnly = true)
     public List<ReviewAssignmentResponse> getMyAssignments(UUID userId) {
         log.info("Fetching assignments for user: {}", userId);
-        Reviewer reviewer = reviewerRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Reviewer profile not found for this user."));
-        return assignmentRepository.findByReviewerId(reviewer.getId()).stream()
-                .map(assignmentMapper::toResponse)
-                .collect(Collectors.toList());
+        return reviewerRepository.findByUserId(userId)
+                .map(reviewer -> assignmentRepository.findByReviewerId(reviewer.getId()).stream()
+                        .map(assignmentMapper::toResponse)
+                        .collect(Collectors.toList()))
+                .orElse(List.of());
     }
 }

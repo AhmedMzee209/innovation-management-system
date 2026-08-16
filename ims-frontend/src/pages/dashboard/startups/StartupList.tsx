@@ -1,61 +1,46 @@
 import { useState } from 'react';
-import { MOCK_STARTUPS, Startup } from '@/data/mockStartups';
-import { MOCK_USERS } from '@/data/mockUsers';
-import { StageBadge, FundingBadge, IncubationBadge } from '@/components/dashboard/startups/cards/StartupStatusBadge';
+import { useStartups } from '@/hooks/useStartup';
+import { StartupSummaryResponse } from '@/services/api/startupService';
+import { StageBadge } from '@/components/dashboard/startups/cards/StartupStatusBadge';
 import { createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, getPaginationRowModel, useReactTable, SortingState } from '@tanstack/react-table';
-import { Search, Filter, ChevronDown, ChevronUp, ArrowRight, Building2 } from 'lucide-react';
+import { Search, Filter, ChevronDown, ChevronUp, ArrowRight, Building2, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { format, parseISO } from 'date-fns';
-import { UserAvatar } from '@/components/dashboard/users/UserAvatar';
 
-const columnHelper = createColumnHelper<Startup>();
+const columnHelper = createColumnHelper<StartupSummaryResponse>();
 
 const columns = [
-  columnHelper.accessor('code', {
+  columnHelper.accessor('startupCode', {
     header: 'Code',
     cell: info => <span className="font-mono text-xs font-bold text-gray-500">{info.getValue()}</span>,
   }),
-  columnHelper.accessor('name', {
+  columnHelper.accessor('startupName', {
     header: 'Startup',
     cell: info => (
       <div>
         <Link to={`/dashboard/startups/${info.row.original.id}`} className="font-bold text-gray-900 dark:text-white hover:text-[#0098c8] hover:underline">
           {info.getValue()}
         </Link>
-        <span className="block text-xs text-gray-500 line-clamp-1 max-w-[200px]">{info.row.original.industry}</span>
+        <span className="block text-xs text-gray-500 line-clamp-1 max-w-[200px]">{info.row.original.tagline || 'No tagline'}</span>
       </div>
     ),
   }),
-  columnHelper.display({
-    id: 'founder',
-    header: 'Founder',
-    cell: info => {
-      const founderInfo = info.row.original.team.find(t => t.role === 'Founder');
-      const user = founderInfo ? MOCK_USERS[founderInfo.userId] : null;
-      if (!user) return <span className="text-gray-400 text-xs">-</span>;
-      return (
-        <div className="flex items-center space-x-2">
-          <UserAvatar firstName={user.firstName} lastName={user.lastName} size="sm" />
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{user.firstName} {user.lastName}</span>
-        </div>
-      );
-    }
-  }),
-  columnHelper.accessor('stage', {
+  columnHelper.accessor('stageName', {
     header: 'Stage',
-    cell: info => <StageBadge stage={info.getValue()} />,
+    cell: info => <StageBadge stage={info.getValue() || 'UNKNOWN'} />,
   }),
-  columnHelper.accessor('incubationStatus', {
-    header: 'Incubation',
-    cell: info => <IncubationBadge status={info.getValue()} />,
+  columnHelper.accessor('status', {
+    header: 'Status',
+    cell: info => (
+      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize ${
+        info.getValue() === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+      }`}>
+        {info.getValue()?.toLowerCase()}
+      </span>
+    ),
   }),
-  columnHelper.accessor('fundingStatus', {
-    header: 'Funding',
-    cell: info => <FundingBadge status={info.getValue()} />,
-  }),
-  columnHelper.accessor('foundedDate', {
-    header: 'Created Date',
-    cell: info => <span className="text-sm text-gray-500">{format(parseISO(info.getValue()), 'MMM d, yyyy')}</span>,
+  columnHelper.accessor('hubName', {
+    header: 'Hub',
+    cell: info => <span className="text-sm text-gray-600 dark:text-gray-300">{info.getValue() || '-'}</span>,
   }),
   columnHelper.display({
     id: 'actions',
@@ -74,9 +59,13 @@ export const StartupList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sorting, setSorting] = useState<SortingState>([]);
   
-  const filteredData = MOCK_STARTUPS.filter(s => 
-    s.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    s.code.toLowerCase().includes(searchQuery.toLowerCase())
+  // Real backend hook
+  const { data: startups = [], isLoading } = useStartups();
+
+  // Client-side search (as backend doesn't support free-text search natively yet)
+  const filteredData = startups.filter(s => 
+    s.startupName.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    s.startupCode.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const table = useReactTable({
@@ -119,8 +108,8 @@ export const StartupList = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden flex flex-col">
-        <div className="overflow-x-auto">
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden flex flex-col min-h-[400px]">
+        <div className="overflow-x-auto flex-1">
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               {table.getHeaderGroups().map(headerGroup => (
@@ -140,47 +129,57 @@ export const StartupList = () => {
               ))}
             </thead>
             <tbody>
-              {table.getRowModel().rows.map(row => (
-                <tr key={row.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                  {row.getVisibleCells().map(cell => (
-                    <td key={cell.id} className="p-4">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
+              {isLoading ? (
+                <tr>
+                  <td colSpan={columns.length} className="p-8 text-center">
+                    <Loader2 className="animate-spin h-8 w-8 text-[#0098c8] mx-auto" />
+                    <p className="mt-2 text-gray-500 text-sm">Loading startups...</p>
+                  </td>
                 </tr>
-              ))}
-              {filteredData.length === 0 && (
+              ) : filteredData.length === 0 ? (
                 <tr>
                   <td colSpan={columns.length} className="p-8 text-center text-gray-500">
                     No startups found matching your search.
                   </td>
                 </tr>
+              ) : (
+                table.getRowModel().rows.map(row => (
+                  <tr key={row.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                    {row.getVisibleCells().map(cell => (
+                      <td key={cell.id} className="p-4">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                ))
               )}
             </tbody>
           </table>
         </div>
         
-        <div className="p-4 border-t border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900 flex items-center justify-between">
-          <div className="text-sm text-gray-500">
-            Showing <span className="font-bold text-gray-900 dark:text-white">{table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}</span> to <span className="font-bold text-gray-900 dark:text-white">{Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize, filteredData.length)}</span> of <span className="font-bold text-gray-900 dark:text-white">{filteredData.length}</span> results
+        {!isLoading && filteredData.length > 0 && (
+          <div className="p-4 border-t border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900 flex items-center justify-between">
+            <div className="text-sm text-gray-500">
+              Showing <span className="font-bold text-gray-900 dark:text-white">{table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}</span> to <span className="font-bold text-gray-900 dark:text-white">{Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize, filteredData.length)}</span> of <span className="font-bold text-gray-900 dark:text-white">{filteredData.length}</span> results
+            </div>
+            <div className="flex space-x-2">
+              <button 
+                onClick={() => table.previousPage()} 
+                disabled={!table.getCanPreviousPage()}
+                className="px-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-colors"
+              >
+                Previous
+              </button>
+              <button 
+                onClick={() => table.nextPage()} 
+                disabled={!table.getCanNextPage()}
+                className="px-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-colors"
+              >
+                Next
+              </button>
+            </div>
           </div>
-          <div className="flex space-x-2">
-            <button 
-              onClick={() => table.previousPage()} 
-              disabled={!table.getCanPreviousPage()}
-              className="px-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-colors"
-            >
-              Previous
-            </button>
-            <button 
-              onClick={() => table.nextPage()} 
-              disabled={!table.getCanNextPage()}
-              className="px-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-colors"
-            >
-              Next
-            </button>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

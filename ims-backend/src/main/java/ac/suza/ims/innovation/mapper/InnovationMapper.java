@@ -21,7 +21,8 @@ import org.mapstruct.MappingTarget;
                 InnovationHubMapper.class, 
                 InnovationCategoryMapper.class,
                 InnovationDocumentMapper.class,
-                InnovationStatusHistoryMapper.class
+                InnovationStatusHistoryMapper.class,
+                InnovationTeamMemberMapper.class
         },
         builder = @Builder(disableBuilder = true))
 public interface InnovationMapper {

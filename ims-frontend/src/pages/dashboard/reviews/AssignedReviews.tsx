@@ -1,72 +1,69 @@
 import { useState } from 'react';
-import { MOCK_REVIEWS, Review } from '@/data/mockReviews';
-import { MOCK_INNOVATIONS } from '@/data/mockInnovations';
-import { MOCK_USERS } from '@/data/mockUsers';
-import { ReviewStatusBadge } from '@/components/dashboard/reviews/cards/ReviewStatusBadge';
-import { createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, getPaginationRowModel, useReactTable, SortingState } from '@tanstack/react-table';
-import { Search, Filter, ChevronDown, ChevronUp, MoreHorizontal, ArrowRight, AlertTriangle } from 'lucide-react';
+import { 
+  createColumnHelper, 
+  flexRender, 
+  getCoreRowModel, 
+  getPaginationRowModel, 
+  getSortedRowModel, 
+  SortingState, 
+  useReactTable 
+} from '@tanstack/react-table';
 import { Link } from 'react-router-dom';
-import { format, isPast, parseISO } from 'date-fns';
-import { cn } from '@/lib/utils';
-import { UserAvatar } from '@/components/dashboard/users/UserAvatar';
+import { format, parseISO, isPast } from 'date-fns';
+import { 
+  AlertTriangle, 
+  ArrowRight, 
+  ChevronDown, 
+  ChevronUp, 
+  Filter, 
+  Loader2, 
+  Search 
+} from 'lucide-react';
 
-const columnHelper = createColumnHelper<Review>();
+import { useMyAssignments } from '@/hooks/useReview';
+import { ReviewAssignmentResponse } from '@/services/api/reviewService';
+import { ReviewStatusBadge } from '@/components/dashboard/reviews/cards/ReviewStatusBadge';
+import { UserAvatar } from '@/components/dashboard/users/UserAvatar';
+import { cn } from '@/lib/utils';
+
+const columnHelper = createColumnHelper<ReviewAssignmentResponse>();
 
 const columns = [
   columnHelper.accessor('id', {
     header: 'Review ID',
     cell: info => <span className="font-mono text-xs font-bold text-gray-500">{info.getValue()}</span>,
   }),
-  columnHelper.accessor('innovationId', {
+  columnHelper.accessor('innovationTitle', {
     header: 'Innovation',
-    cell: info => {
-      const inv = MOCK_INNOVATIONS.find(i => i.id === info.getValue())!;
-      return (
-        <div>
-          <Link to={`/dashboard/reviews/${info.row.original.id}`} className="font-bold text-gray-900 dark:text-white hover:text-[#0098c8] hover:underline line-clamp-1 max-w-[250px]">
-            {inv.title}
-          </Link>
-          <span className="text-xs text-gray-500">{inv.categoryId}</span>
-        </div>
-      );
-    },
+    cell: info => (
+      <div>
+        <Link to={`/dashboard/reviews/${info.row.original.innovationId}`} className="font-bold text-gray-900 dark:text-white hover:text-[#0098c8] hover:underline line-clamp-1 max-w-[250px]">
+          {info.getValue()}
+        </Link>
+        <span className="text-xs text-gray-500">{info.row.original.innovationCode}</span>
+      </div>
+    ),
   }),
-  columnHelper.accessor('reviewerId', {
+  columnHelper.accessor('reviewerName', {
     header: 'Reviewer',
-    cell: info => {
-      const user = MOCK_USERS[info.getValue()];
-      return (
-        <div className="flex items-center space-x-2">
-          <UserAvatar firstName={user?.firstName || 'A'} lastName={user?.lastName || 'B'} size="sm" />
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{user?.firstName} {user?.lastName}</span>
-        </div>
-      );
-    },
-  }),
-  columnHelper.accessor('priority', {
-    header: 'Priority',
-    cell: info => {
-      const val = info.getValue();
-      return (
-        <span className={cn(
-          "text-xs font-bold px-2 py-1 rounded",
-          val === 'High' ? "bg-red-50 text-red-700 dark:bg-red-900/20" : 
-          val === 'Normal' ? "bg-blue-50 text-blue-700 dark:bg-blue-900/20" : "bg-gray-100 text-gray-700 dark:bg-gray-800"
-        )}>{val}</span>
-      );
-    },
+    cell: info => (
+      <div className="flex items-center space-x-2">
+        <UserAvatar firstName={info.getValue()?.split(' ')[0] || 'A'} lastName={info.getValue()?.split(' ')[1] || 'B'} size="sm" />
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{info.getValue()}</span>
+      </div>
+    ),
   }),
   columnHelper.accessor('status', {
     header: 'Status',
     cell: info => {
-      const isOverdue = info.getValue() !== 'Evaluated' && isPast(parseISO(info.row.original.deadlineDate));
+      const isOverdue = info.getValue() !== 'COMPLETED' && isPast(parseISO(info.row.original.deadline));
       return <ReviewStatusBadge status={isOverdue ? 'Overdue' : info.getValue()} />;
     },
   }),
-  columnHelper.accessor('deadlineDate', {
+  columnHelper.accessor('deadline', {
     header: 'Deadline',
     cell: info => {
-      const isOverdue = info.row.original.status !== 'Evaluated' && isPast(parseISO(info.getValue()));
+      const isOverdue = info.row.original.status !== 'COMPLETED' && isPast(parseISO(info.getValue()));
       return (
         <div className={cn("flex items-center text-sm", isOverdue ? "text-red-600 font-bold" : "text-gray-500")}>
           {isOverdue && <AlertTriangle size={14} className="mr-1" />}
@@ -79,9 +76,9 @@ const columns = [
     id: 'actions',
     cell: info => (
       <Link 
-        to={`/dashboard/reviews/${info.row.original.id}`}
+        to={`/dashboard/reviews/evaluate/${info.row.original.innovationId}`}
         className="inline-flex items-center justify-center p-2 text-gray-400 hover:text-[#0098c8] hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-        title="View Review Details"
+        title="Start Evaluation"
       >
         <ArrowRight size={18} />
       </Link>
@@ -93,9 +90,10 @@ export const AssignedReviews = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sorting, setSorting] = useState<SortingState>([]);
   
-  const filteredData = MOCK_REVIEWS.filter(rev => {
-    const inv = MOCK_INNOVATIONS.find(i => i.id === rev.innovationId);
-    return inv?.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const { data: assignments = [], isLoading, isError } = useMyAssignments();
+  
+  const filteredData = assignments.filter(rev => {
+    return rev.innovationTitle?.toLowerCase().includes(searchQuery.toLowerCase()) || 
            rev.id.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
@@ -108,6 +106,22 @@ export const AssignedReviews = () => {
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[50vh]">
+        <Loader2 className="w-8 h-8 text-[#0098c8] animate-spin" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center h-[50vh] text-red-500">
+        Failed to load assigned reviews.
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">

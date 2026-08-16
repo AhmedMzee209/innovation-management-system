@@ -81,7 +81,7 @@ public class InnovationServiceImpl implements InnovationService {
         Innovation saved = innovationRepository.save(innovation);
         
         // Record status history
-        recordStatusHistory(saved, null, InnovationStatus.DRAFT, "Initial Draft Creation", owner);
+        recordStatusHistory(saved, null, InnovationStatus.DRAFT, "Initial Draft Created", owner);
 
         return innovationMapper.toResponse(saved);
     }

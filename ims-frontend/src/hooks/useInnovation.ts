@@ -46,6 +46,17 @@ export const useUpdateInnovation = () => {
   });
 };
 
+export const useSubmitInnovation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => innovationService.submitInnovation(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['innovations'] });
+      queryClient.invalidateQueries({ queryKey: ['innovation', id] });
+    },
+  });
+};
+
 export const useDeleteInnovation = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -70,6 +81,52 @@ export const useCreateInnovationCategory = () => {
     mutationFn: (data: any) => innovationService.createCategory(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['innovation-categories'] });
+    },
+  });
+};
+
+// Team Members
+export const useAddTeamMember = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: { name: string; email: string; role: string } }) =>
+      innovationService.addTeamMember(id, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['innovation', variables.id] });
+    },
+  });
+};
+
+export const useRemoveTeamMember = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, memberId }: { id: string; memberId: string }) =>
+      innovationService.removeTeamMember(id, memberId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['innovation', variables.id] });
+    },
+  });
+};
+
+// Documents
+export const useUploadDocument = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, file, documentType }: { id: string; file: File; documentType: string }) =>
+      innovationService.uploadDocument(id, file, documentType),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['innovation', variables.id] });
+    },
+  });
+};
+
+export const useDeleteDocument = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, documentId }: { id: string; documentId: string }) =>
+      innovationService.deleteDocument(id, documentId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['innovation', variables.id] });
     },
   });
 };

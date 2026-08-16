@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
-import { MoreHorizontal, Edit, Trash2, Key, ShieldOff, Shield } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, Key, ShieldOff, Shield, UserCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { userService } from '@/services/api/userService';
 import Swal from 'sweetalert2';
 import { UserResponse } from '@/types/auth';
+import { CreateReviewerProfileModal } from '@/components/dashboard/users/CreateReviewerProfileModal';
 
 interface ActionDropdownProps {
   user: UserResponse;
@@ -14,6 +15,7 @@ interface ActionDropdownProps {
 
 export const ActionDropdown = ({ user, status }: ActionDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isReviewerModalOpen, setIsReviewerModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
@@ -116,6 +118,16 @@ export const ActionDropdown = ({ user, status }: ActionDropdownProps) => {
             </button>
           )}
 
+          {user.roles?.some((r: any) => r.name === 'REVIEWER') && (
+            <button 
+              onClick={() => { setIsOpen(false); setIsReviewerModalOpen(true); }}
+              className="flex items-center px-4 py-2 text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-500/10 w-full"
+            >
+              <UserCheck size={14} className="mr-2" />
+              Register Profile
+            </button>
+          )}
+
           <div className="h-px bg-gray-200 dark:bg-gray-800 my-1" />
           
           <button 
@@ -127,6 +139,12 @@ export const ActionDropdown = ({ user, status }: ActionDropdownProps) => {
           </button>
         </div>
       )}
+      
+      <CreateReviewerProfileModal 
+        isOpen={isReviewerModalOpen} 
+        onClose={() => setIsReviewerModalOpen(false)} 
+        user={user} 
+      />
     </div>
   );
 };

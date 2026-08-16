@@ -1,22 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MOCK_INNOVATIONS } from '@/data/mockInnovations';
-import { MOCK_REVIEWS } from '@/data/mockReviews';
-import { Building2, ArrowRight, ArrowLeft, CheckCircle2, Rocket, Briefcase, FileText } from 'lucide-react';
+import { useInnovations } from '@/hooks/useInnovation';
+import { useCreateStartup, useStartupStages } from '@/hooks/useStartup';
+import { Building2, ArrowRight, ArrowLeft, CheckCircle2, Rocket, Briefcase } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store';
+import { toast } from 'sonner';
 
 const formSchema = z.object({
-  innovationId: z.string().min(1, 'You must select an approved innovation'),
-  name: z.string().min(3, 'Startup name is required'),
+  innovationId: z.string().min(1, 'You must select an innovation'),
+  startupName: z.string().min(3, 'Startup name is required'),
   tagline: z.string().min(10, 'Tagline must be at least 10 characters'),
-  industry: z.string().min(1, 'Industry is required'),
-  businessModel: z.string().min(1, 'Business model is required'),
-  vision: z.string().min(20, 'Vision statement must be detailed'),
-  mission: z.string().min(20, 'Mission statement must be detailed'),
+  description: z.string().optional(),
+  vision: z.string().min(10, 'Vision statement must be detailed'),
+  mission: z.string().min(10, 'Mission statement must be detailed'),
+  stageId: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -25,44 +28,59 @@ export const CreateStartup = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [selectedInnovationId, setSelectedInnovationId] = useState<string>('');
+  const user = useSelector((state: RootState) => state.auth.user);
+  
+  const { data: innovations = [] } = useInnovations();
+  const { data: stages = [] } = useStartupStages();
+  const { mutateAsync: createStartup, isPending } = useCreateStartup();
 
-  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<FormValues>({
+  // In a real system, you'd filter by approved ones or ones that don't have a startup yet.
+  // Assuming the backend has a way or we just show innovations where user is a team member and it's somewhat mature.
+  const approvedInnovations = innovations;
+
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       innovationId: '',
-      name: '',
+      startupName: '',
       tagline: '',
-      industry: '',
-      businessModel: '',
+      description: '',
       vision: '',
       mission: '',
+      stageId: '',
     }
   });
-
-  const approvedInnovationIds = MOCK_REVIEWS
-    .filter(r => r.decision === 'Approve' || r.decision === 'Recommend Incubation')
-    .map(r => r.innovationId);
-
-  const approvedInnovations = MOCK_INNOVATIONS.filter(i => approvedInnovationIds.includes(i.id));
 
   // Auto-fill form when innovation is selected
   useEffect(() => {
     if (selectedInnovationId) {
-      const inv = MOCK_INNOVATIONS.find(i => i.id === selectedInnovationId);
+      const inv = approvedInnovations.find(i => i.id === selectedInnovationId);
       if (inv) {
         setValue('innovationId', inv.id);
-        setValue('name', `${inv.title.split(' ')[0]} Tech`);
-        setValue('industry', inv.categoryId);
+        setValue('startupName', `${inv.title.split(' ')[0]} Tech`);
+        setValue('description', inv.abstractText);
       }
     }
-  }, [selectedInnovationId, setValue]);
+  }, [selectedInnovationId, setValue, approvedInnovations]);
 
-  const onSubmit = (data: FormValues) => {
+  const onSubmit = async (data: FormValues) => {
     if (step < 3) {
       setStep(prev => prev + 1);
     } else {
-      console.log('Final Data:', data);
-      navigate('/dashboard/startups');
+      if (!user?.id) {
+        toast.error('User not authenticated.');
+        return;
+      }
+      
+      try {
+        await createStartup({
+          ...data,
+          founderUserId: user.id
+        });
+        navigate('/dashboard/startups');
+      } catch (err) {
+        // Error handled in hook
+      }
     }
   };
 
@@ -80,7 +98,7 @@ export const CreateStartup = () => {
           <Building2 size={32} className="text-white" />
         </div>
         <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Launch Startup</h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-2 max-w-lg">Convert an approved university innovation into a full-fledged startup entity within the ecosystem.</p>
+        <p className="text-gray-500 dark:text-gray-400 mt-2 max-w-lg">Convert an innovation into a full-fledged startup entity within the ecosystem.</p>
       </div>
 
       <div className="mb-10">
@@ -120,8 +138,8 @@ export const CreateStartup = () => {
                   className="space-y-6"
                 >
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Select Approved Innovation</h2>
-                    <p className="text-sm text-gray-500 mb-6">You can only create a startup from an innovation that has been formally approved by the review committee.</p>
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Select Innovation</h2>
+                    <p className="text-sm text-gray-500 mb-6">Select the innovation you are converting into a startup.</p>
                   </div>
                   
                   <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 scrollbar-hide">
@@ -139,14 +157,17 @@ export const CreateStartup = () => {
                         <div className="flex justify-between items-start">
                           <div>
                             <h3 className="font-bold text-gray-900 dark:text-white">{inv.title}</h3>
-                            <p className="text-xs font-medium text-gray-500 mt-1">{inv.categoryId}</p>
+                            <p className="text-xs font-medium text-gray-500 mt-1 line-clamp-1">{inv.abstractText}</p>
                           </div>
                           {selectedInnovationId === inv.id && (
-                            <CheckCircle2 size={20} className="text-[#0098c8]" />
+                            <CheckCircle2 size={20} className="text-[#0098c8] shrink-0 ml-4" />
                           )}
                         </div>
                       </div>
                     ))}
+                    {approvedInnovations.length === 0 && (
+                      <p className="text-sm text-gray-500 text-center py-4">No innovations found.</p>
+                    )}
                   </div>
                   {errors.innovationId && <p className="text-red-500 text-sm mt-2">{errors.innovationId.message}</p>}
                 </motion.div>
@@ -170,11 +191,11 @@ export const CreateStartup = () => {
                     <div>
                       <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Startup Name</label>
                       <input 
-                        {...register('name')}
+                        {...register('startupName')}
                         className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] dark:text-white transition-all"
                         placeholder="e.g. Acme Tech"
                       />
-                      {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
+                      {errors.startupName && <p className="text-red-500 text-xs mt-1">{errors.startupName.message}</p>}
                     </div>
                     
                     <div>
@@ -188,12 +209,17 @@ export const CreateStartup = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Industry / Category</label>
-                      <input 
-                        {...register('industry')}
-                        disabled
-                        className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-500 cursor-not-allowed"
-                      />
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Initial Stage</label>
+                      <select 
+                        {...register('stageId')}
+                        className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] dark:text-white transition-all appearance-none"
+                      >
+                        <option value="">Select Stage...</option>
+                        {stages.map(s => (
+                          <option key={s.id} value={s.id}>{s.name}</option>
+                        ))}
+                      </select>
+                      {errors.stageId && <p className="text-red-500 text-xs mt-1">{errors.stageId.message}</p>}
                     </div>
                   </div>
                 </motion.div>
@@ -210,26 +236,10 @@ export const CreateStartup = () => {
                 >
                   <div>
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Business Details</h2>
-                    <p className="text-sm text-gray-500 mb-6">Describe the business model, vision, and mission of the company.</p>
+                    <p className="text-sm text-gray-500 mb-6">Describe the vision and mission of the company.</p>
                   </div>
 
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Business Model</label>
-                      <select 
-                        {...register('businessModel')}
-                        className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#0098c8] dark:text-white transition-all appearance-none"
-                      >
-                        <option value="">Select a model...</option>
-                        <option value="B2B SaaS">B2B SaaS</option>
-                        <option value="B2C Marketplace">B2C Marketplace</option>
-                        <option value="Direct to Consumer (D2C)">Direct to Consumer (D2C)</option>
-                        <option value="Hardware Sales">Hardware Sales</option>
-                        <option value="Subscription Service">Subscription Service</option>
-                      </select>
-                      {errors.businessModel && <p className="text-red-500 text-xs mt-1">{errors.businessModel.message}</p>}
-                    </div>
-                    
                     <div>
                       <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Vision Statement</label>
                       <textarea 
@@ -271,11 +281,11 @@ export const CreateStartup = () => {
             
             <button 
               type="submit"
-              disabled={step === 1 && !selectedInnovationId}
+              disabled={isPending || (step === 1 && !selectedInnovationId)}
               className="px-6 py-2.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg text-sm font-bold hover:bg-gray-800 dark:hover:bg-white transition-colors shadow-sm flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {step === steps.length ? 'Launch Startup' : 'Continue'} 
-              {step !== steps.length && <ArrowRight size={16} className="ml-2" />}
+              {isPending ? 'Processing...' : (step === steps.length ? 'Launch Startup' : 'Continue')} 
+              {!isPending && step !== steps.length && <ArrowRight size={16} className="ml-2" />}
             </button>
           </div>
         </form>

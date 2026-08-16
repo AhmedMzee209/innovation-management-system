@@ -1,41 +1,52 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MOCK_REVIEWS, EVALUATION_CRITERIA, ReviewDecision } from '@/data/mockReviews';
-import { MOCK_INNOVATIONS } from '@/data/mockInnovations';
-import { Check, ChevronRight, FileText, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { Check, ChevronRight, FileText, CheckCircle2, ShieldAlert, Loader2 } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-
-// Dynamically build Zod schema based on criteria
-const criteriaSchemaShape: any = {};
-EVALUATION_CRITERIA.forEach(c => {
-  criteriaSchemaShape[`score_${c.id}`] = z.number().min(1, 'Score required').max(10, 'Max 10');
-  criteriaSchemaShape[`remark_${c.id}`] = z.string().min(10, 'Remark must be at least 10 characters');
-});
-
-const schema = z.object({
-  ...criteriaSchemaShape,
-  strengths: z.string().min(20, 'Required'),
-  weaknesses: z.string().min(20, 'Required'),
-  recommendations: z.string().min(20, 'Required'),
-  decision: z.enum(['Approve', 'Reject', 'Revision Required', 'Recommend Incubation'] as const, {
-    errorMap: () => ({ message: "Please make a final decision" })
-  })
-});
-
-type EvaluationFormValues = z.infer<typeof schema>;
+import { useEvaluationCriteria, useMyAssignments, useSubmitReview } from '@/hooks/useReview';
+import { useInnovation } from '@/hooks/useInnovation';
+import { SubmitReviewRequest } from '@/services/api/reviewService';
+import { toast } from 'sonner';
 
 export const InnovationEvaluation = () => {
-  const { id } = useParams();
+  const { id: innovationId } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const review = MOCK_REVIEWS.find(r => r.id === id);
-  const innovation = MOCK_INNOVATIONS.find(i => i.id === review?.innovationId);
+
+  const { data: assignments = [], isLoading: isLoadingAssignments } = useMyAssignments();
+  const { data: criteria = [], isLoading: isLoadingCriteria } = useEvaluationCriteria();
+  const { data: innovation, isLoading: isLoadingInnovation } = useInnovation(innovationId!);
+  const { mutate: submitReview, isPending: isSubmitting } = useSubmitReview();
+
+  const assignment = assignments.find(a => a.innovationId === innovationId);
 
   const [currentSection, setCurrentSection] = useState(0);
-  const sections = ['Innovation', 'Technical', 'Business', 'Impact', 'Final Decision'];
+  const sections = ['Evaluation Criteria', 'Final Decision'];
+
+  // Dynamically build Zod schema
+  const schema = useMemo(() => {
+    const criteriaSchemaShape: any = {};
+    criteria.forEach(c => {
+      criteriaSchemaShape[`score_${c.id}`] = z.number({ required_error: 'Required' })
+        .min(1, 'Score required')
+        .max(c.maximumScore, `Max ${c.maximumScore}`);
+      criteriaSchemaShape[`remark_${c.id}`] = z.string().min(10, 'Remark must be at least 10 characters');
+    });
+
+    return z.object({
+      ...criteriaSchemaShape,
+      strengths: z.string().min(20, 'Required'),
+      weaknesses: z.string().min(20, 'Required'),
+      recommendations: z.string().min(20, 'Required'),
+      decision: z.enum(['APPROVE', 'REJECT', 'REVISION_REQUIRED', 'RECOMMEND_INCUBATION'] as const, {
+        errorMap: () => ({ message: "Please make a final decision" })
+      })
+    });
+  }, [criteria]);
+
+  type EvaluationFormValues = z.infer<typeof schema>;
 
   const { control, handleSubmit, formState: { errors }, watch } = useForm<EvaluationFormValues>({
     resolver: zodResolver(schema),
@@ -46,22 +57,66 @@ export const InnovationEvaluation = () => {
 
   const watchAll = watch();
   
-  // Calculate total score on the fly
-  const currentTotal = EVALUATION_CRITERIA.reduce((sum, c) => {
+  const currentTotal = criteria.reduce((sum, c) => {
     return sum + (watchAll[`score_${c.id}`] || 0);
   }, 0);
 
-  if (!review || !innovation) return <div className="p-8 text-center">Review not found</div>;
+  const maxTotal = criteria.reduce((sum, c) => sum + c.maximumScore, 0) || 80;
 
-  const onSubmit = async (data: EvaluationFormValues) => {
-    console.log("Evaluation Submitted:", data);
-    // Simulate save
-    await new Promise(r => setTimeout(r, 1000));
-    navigate('/dashboard/reviews');
+  if (isLoadingAssignments || isLoadingCriteria || isLoadingInnovation) {
+    return (
+      <div className="flex items-center justify-center h-[50vh]">
+        <Loader2 className="w-8 h-8 text-[#0098c8] animate-spin" />
+      </div>
+    );
+  }
+
+  if (!assignment) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[50vh] text-center">
+        <ShieldAlert size={48} className="text-red-500 mb-4" />
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Not Assigned</h2>
+        <p className="text-gray-500">You are not assigned to review this innovation.</p>
+        <button onClick={() => navigate('/dashboard/reviews')} className="mt-4 text-[#0098c8] hover:underline">
+          Back to Assignments
+        </button>
+      </div>
+    );
+  }
+
+  const onSubmit = (data: EvaluationFormValues) => {
+    if (!assignment) return;
+
+    const scores = criteria.map(c => ({
+      criteriaId: c.id,
+      score: data[`score_${c.id}`] as number,
+      remarks: data[`remark_${c.id}`] as string,
+    }));
+
+    const payload: SubmitReviewRequest = {
+      assignmentId: assignment.id,
+      decision: data.decision as any,
+      overallScore: currentTotal,
+      strengths: data.strengths,
+      weaknesses: data.weaknesses,
+      recommendations: data.recommendations,
+      remarks: 'Evaluation submitted via dashboard',
+      scores,
+      comments: []
+    };
+
+    submitReview(payload, {
+      onSuccess: () => {
+        toast.success('Evaluation submitted successfully');
+        navigate('/dashboard/reviews');
+      },
+      onError: (error: any) => {
+        toast.error(error?.response?.data?.message || 'Failed to submit evaluation');
+      }
+    });
   };
 
-  const renderCriteriaSection = (categoryName: string) => {
-    const criteria = EVALUATION_CRITERIA.filter(c => c.category === categoryName);
+  const renderCriteriaSection = () => {
     return (
       <div className="space-y-8">
         {criteria.map((crit, idx) => (
@@ -74,13 +129,13 @@ export const InnovationEvaluation = () => {
                 <p className="text-sm text-gray-500">{crit.description}</p>
               </div>
               <div className="bg-blue-50 dark:bg-blue-900/20 text-[#0098c8] font-bold px-3 py-1 rounded-lg text-sm border border-blue-100 dark:border-blue-900/30">
-                Max {crit.maxScore} pts
+                Max {crit.maximumScore} pts
               </div>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Score (1-10) <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Score (1-{crit.maximumScore}) <span className="text-red-500">*</span></label>
                 <Controller
                   name={`score_${crit.id}`}
                   control={control}
@@ -88,8 +143,9 @@ export const InnovationEvaluation = () => {
                     <input 
                       type="number" 
                       min="1" 
-                      max="10"
+                      max={crit.maximumScore}
                       {...field}
+                      value={field.value || ''}
                       onChange={e => field.onChange(parseInt(e.target.value) || 0)}
                       className={cn(
                         "w-24 px-4 py-2 border rounded-lg focus:ring-2 bg-gray-50 dark:bg-gray-800/50 dark:text-white",
@@ -137,6 +193,7 @@ export const InnovationEvaluation = () => {
           {sections.map((sec, idx) => (
             <button 
               key={idx}
+              type="button"
               onClick={() => setCurrentSection(idx)}
               className={cn(
                 "relative z-10 w-full flex items-center p-2 rounded-lg text-sm font-medium transition-all group",
@@ -158,10 +215,10 @@ export const InnovationEvaluation = () => {
           <p className="text-xs font-bold uppercase text-gray-500 mb-1">Total Score</p>
           <div className="flex items-end">
             <span className="text-3xl font-black text-gray-900 dark:text-white leading-none">{currentTotal}</span>
-            <span className="text-sm font-medium text-gray-500 ml-1 mb-1">/ 80</span>
+            <span className="text-sm font-medium text-gray-500 ml-1 mb-1">/ {maxTotal}</span>
           </div>
           <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5 mt-3">
-            <div className="bg-[#0098c8] h-1.5 rounded-full transition-all duration-500" style={{ width: `${(currentTotal / 80) * 100}%` }}></div>
+            <div className="bg-[#0098c8] h-1.5 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, (currentTotal / maxTotal) * 100)}%` }}></div>
           </div>
         </div>
       </div>
@@ -173,7 +230,7 @@ export const InnovationEvaluation = () => {
         <div className="p-6 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between shrink-0">
           <div>
             <h1 className="text-xl font-bold text-gray-900 dark:text-white">Review Evaluation Form</h1>
-            <p className="text-sm text-gray-500">Innovation: {innovation.title}</p>
+            <p className="text-sm text-gray-500">Innovation: {innovation?.title}</p>
           </div>
         </div>
 
@@ -188,9 +245,9 @@ export const InnovationEvaluation = () => {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                {currentSection < 4 && renderCriteriaSection(sections[currentSection])}
+                {currentSection === 0 && renderCriteriaSection()}
                 
-                {currentSection === 4 && (
+                {currentSection === 1 && (
                   <div className="space-y-6">
                     <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4 flex items-start text-amber-800 dark:text-amber-400">
                       <ShieldAlert size={20} className="mr-3 shrink-0 mt-0.5" />
@@ -204,7 +261,7 @@ export const InnovationEvaluation = () => {
                           name="strengths" control={control}
                           render={({ field }) => <textarea {...field} rows={3} className={cn("w-full px-4 py-2 border rounded-lg focus:ring-2 bg-gray-50 dark:bg-gray-800/50 dark:text-white", errors.strengths ? "border-red-500" : "border-gray-200 dark:border-gray-700")} />}
                         />
-                        {errors.strengths && <p className="text-red-500 text-xs mt-1">{errors.strengths.message}</p>}
+                        {errors.strengths && <p className="text-red-500 text-xs mt-1">{errors.strengths.message as string}</p>}
                       </div>
                       
                       <div className="md:col-span-2">
@@ -213,7 +270,7 @@ export const InnovationEvaluation = () => {
                           name="weaknesses" control={control}
                           render={({ field }) => <textarea {...field} rows={3} className={cn("w-full px-4 py-2 border rounded-lg focus:ring-2 bg-gray-50 dark:bg-gray-800/50 dark:text-white", errors.weaknesses ? "border-red-500" : "border-gray-200 dark:border-gray-700")} />}
                         />
-                        {errors.weaknesses && <p className="text-red-500 text-xs mt-1">{errors.weaknesses.message}</p>}
+                        {errors.weaknesses && <p className="text-red-500 text-xs mt-1">{errors.weaknesses.message as string}</p>}
                       </div>
 
                       <div className="md:col-span-2">
@@ -222,35 +279,40 @@ export const InnovationEvaluation = () => {
                           name="recommendations" control={control}
                           render={({ field }) => <textarea {...field} rows={3} className={cn("w-full px-4 py-2 border rounded-lg focus:ring-2 bg-gray-50 dark:bg-gray-800/50 dark:text-white", errors.recommendations ? "border-red-500" : "border-gray-200 dark:border-gray-700")} />}
                         />
-                        {errors.recommendations && <p className="text-red-500 text-xs mt-1">{errors.recommendations.message}</p>}
+                        {errors.recommendations && <p className="text-red-500 text-xs mt-1">{errors.recommendations.message as string}</p>}
                       </div>
 
                       <div className="md:col-span-2 border-t border-gray-200 dark:border-gray-800 pt-6">
                         <label className="block text-sm font-medium text-gray-900 dark:text-white mb-3">Final Decision <span className="text-red-500">*</span></label>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                          {['Approve', 'Recommend Incubation', 'Revision Required', 'Reject'].map(dec => (
+                          {[
+                            { label: 'Approve', value: 'APPROVE' },
+                            { label: 'Recommend Incubation', value: 'RECOMMEND_INCUBATION' },
+                            { label: 'Revision Required', value: 'REVISION_REQUIRED' },
+                            { label: 'Reject', value: 'REJECT' }
+                          ].map(dec => (
                             <Controller
-                              key={dec} name="decision" control={control}
+                              key={dec.value} name="decision" control={control}
                               render={({ field }) => (
                                 <button
                                   type="button"
-                                  onClick={() => field.onChange(dec)}
+                                  onClick={() => field.onChange(dec.value)}
                                   className={cn(
                                     "p-3 text-sm font-medium rounded-xl border text-center transition-all",
-                                    field.value === dec ? 
-                                      (dec === 'Approve' || dec === 'Recommend Incubation' ? "border-green-500 bg-green-50 text-green-700" :
-                                       dec === 'Reject' ? "border-red-500 bg-red-50 text-red-700" :
-                                       "border-amber-500 bg-amber-50 text-amber-700") :
+                                    field.value === dec.value ? 
+                                      (dec.value === 'APPROVE' || dec.value === 'RECOMMEND_INCUBATION' ? "border-green-500 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400" :
+                                       dec.value === 'REJECT' ? "border-red-500 bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400" :
+                                       "border-amber-500 bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400") :
                                       "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-gray-300"
                                   )}
                                 >
-                                  {dec}
+                                  {dec.label}
                                 </button>
                               )}
                             />
                           ))}
                         </div>
-                        {errors.decision && <p className="text-red-500 text-xs mt-2 text-center">{errors.decision.message}</p>}
+                        {errors.decision && <p className="text-red-500 text-xs mt-2 text-center">{errors.decision.message as string}</p>}
                       </div>
                     </div>
                   </div>
@@ -271,10 +333,10 @@ export const InnovationEvaluation = () => {
             Previous
           </button>
           
-          {currentSection < 4 ? (
+          {currentSection < 1 ? (
             <button 
               type="button" 
-              onClick={() => setCurrentSection(Math.min(4, currentSection + 1))}
+              onClick={() => setCurrentSection(Math.min(1, currentSection + 1))}
               className="px-6 py-2 bg-[#0098c8] text-white rounded-lg text-sm font-bold hover:bg-[#007aa3] transition-colors flex items-center shadow-sm"
             >
               Next Section <ChevronRight size={16} className="ml-1" />
@@ -283,9 +345,11 @@ export const InnovationEvaluation = () => {
             <button 
               type="submit" 
               form="eval-form"
-              className="px-6 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700 transition-colors flex items-center shadow-sm"
+              disabled={isSubmitting}
+              className="px-6 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700 transition-colors flex items-center shadow-sm disabled:opacity-50"
             >
-              <CheckCircle2 size={16} className="mr-2" /> Submit Final Evaluation
+              {isSubmitting ? <Loader2 size={16} className="mr-2 animate-spin" /> : <CheckCircle2 size={16} className="mr-2" />}
+              Submit Final Evaluation
             </button>
           )}
         </div>

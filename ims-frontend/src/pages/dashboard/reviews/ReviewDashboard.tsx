@@ -1,18 +1,29 @@
-import { ClipboardCheck, FileText, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { ClipboardCheck, CheckCircle, Clock } from 'lucide-react';
 import { StatCard } from '@/components/dashboard/widgets/StatCard';
-import { MOCK_REVIEWS } from '@/data/mockReviews';
+import { useMyAssignments } from '@/hooks/useReview';
+import { Loader2 } from 'lucide-react';
 import { ReviewCard } from '@/components/dashboard/reviews/cards/ReviewCard';
 import { isPast, parseISO } from 'date-fns';
 
 export const ReviewDashboard = () => {
-  const total = MOCK_REVIEWS.length;
-  const pending = MOCK_REVIEWS.filter(r => r.status === 'Pending' || r.status === 'In Progress').length;
-  const completed = MOCK_REVIEWS.filter(r => r.status === 'Evaluated').length;
-  const overdue = MOCK_REVIEWS.filter(r => r.status !== 'Evaluated' && isPast(parseISO(r.deadlineDate))).length;
+  const { data: assignments = [], isLoading } = useMyAssignments();
 
-  const urgentReviews = MOCK_REVIEWS
-    .filter(r => r.status !== 'Evaluated')
-    .sort((a, b) => new Date(a.deadlineDate).getTime() - new Date(b.deadlineDate).getTime())
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[50vh]">
+        <Loader2 className="w-8 h-8 text-[#0098c8] animate-spin" />
+      </div>
+    );
+  }
+
+  const total = assignments.length;
+  const pending = assignments.filter(r => r.status === 'PENDING' || r.status === 'IN_PROGRESS').length;
+  const completed = assignments.filter(r => r.status === 'COMPLETED').length;
+  const overdue = assignments.filter(r => r.status !== 'COMPLETED' && isPast(parseISO(r.deadline))).length;
+
+  const urgentReviews = [...assignments]
+    .filter(r => r.status !== 'COMPLETED')
+    .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())
     .slice(0, 4);
 
   return (
@@ -28,10 +39,10 @@ export const ReviewDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard id="r1" label="Total Assigned" value={total.toString()} trend={{ value: 5, isPositive: true }} icon={FileText} />
-        <StatCard id="r2" label="Pending / In Progress" value={pending.toString()} trend={{ value: 2, isPositive: false }} icon={Clock} />
-        <StatCard id="r3" label="Evaluated" value={completed.toString()} trend={{ value: 12, isPositive: true }} icon={CheckCircle} />
-        <StatCard id="r4" label="Overdue" value={overdue.toString()} trend={{ value: overdue, isPositive: false }} icon={AlertCircle} />
+        <StatCard title="Total Assigned" value={total} trend={5} icon="FileText" />
+        <StatCard title="Pending / In Progress" value={pending} trend={-2} icon="Clock" />
+        <StatCard title="Evaluated" value={completed} trend={12} icon="CheckCircle" />
+        <StatCard title="Overdue" value={overdue} trend={-overdue} icon="AlertCircle" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

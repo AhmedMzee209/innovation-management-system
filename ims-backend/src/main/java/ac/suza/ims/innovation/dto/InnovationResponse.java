@@ -46,4 +46,5 @@ public class InnovationResponse {
     
     private List<InnovationDocumentResponse> documents;
     private List<InnovationStatusHistoryResponse> statusHistory;
+    private List<InnovationTeamMemberResponse> teamMembers;
 }

@@ -63,7 +63,7 @@ export const SIDEBAR_NAVIGATION: NavGroup[] = [
         subItems: [
           { name: 'Categories', href: '/dashboard/innovations/categories' },
           { name: 'My Submissions', href: '/dashboard/innovations/my' },
-          { name: 'All Innovations', href: '/dashboard/innovations/all' },
+          { name: 'All Innovations', href: '/dashboard/innovations' },
         ]
       },
       {

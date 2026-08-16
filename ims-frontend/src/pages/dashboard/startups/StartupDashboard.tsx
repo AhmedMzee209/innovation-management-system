@@ -1,21 +1,27 @@
-import { Building2, CheckCircle, TrendingUp, DollarSign, Users, AlertCircle } from 'lucide-react';
+import { Building2, CheckCircle, TrendingUp, DollarSign, Users, AlertCircle, Loader2 } from 'lucide-react';
 import { StatCard } from '@/components/dashboard/widgets/StatCard';
-import { MOCK_STARTUPS } from '@/data/mockStartups';
+import { useStartups } from '@/hooks/useStartup';
 import { StartupCard } from '@/components/dashboard/startups/cards/StartupCard';
 import { Link } from 'react-router-dom';
 
 export const StartupDashboard = () => {
-  const total = MOCK_STARTUPS.length;
-  const incubating = MOCK_STARTUPS.filter(s => s.incubationStatus === 'Active').length;
-  const totalFunding = MOCK_STARTUPS.reduce((acc, curr) => acc + curr.totalFundingRaised, 0);
+  const { data: startups = [], isLoading } = useStartups();
+
+  const total = startups.length;
+  const active = startups.filter(s => s.status === 'ACTIVE').length;
   
-  const topStartups = [...MOCK_STARTUPS]
-    .sort((a, b) => b.totalFundingRaised - a.totalFundingRaised)
+  // Funding is not explicitly provided in StartupSummaryResponse so we'll mock the funding stat or hide it.
+  // We'll show Hub count instead or active vs graduated.
+  const topStartups = [...startups]
     .slice(0, 3);
 
-  const newStartups = [...MOCK_STARTUPS]
-    .sort((a, b) => new Date(b.foundedDate).getTime() - new Date(a.foundedDate).getTime())
-    .slice(0, 3);
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="animate-spin h-8 w-8 text-[#0098c8]" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
@@ -36,17 +42,17 @@ export const StartupDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard id="s1" label="Total Startups" value={total.toString()} trend={{ value: 12, isPositive: true }} icon={Building2} />
-        <StatCard id="s2" label="Active Incubation" value={incubating.toString()} trend={{ value: 5, isPositive: true }} icon={Users} />
-        <StatCard id="s3" label="Total Funding Raised" value={`$${(totalFunding / 1000000).toFixed(1)}M`} trend={{ value: 8, isPositive: true }} icon={DollarSign} />
-        <StatCard id="s4" label="Success Rate" value="68%" trend={{ value: 2, isPositive: true }} icon={CheckCircle} />
+        <StatCard title="Total Startups" value={total} trend={12} icon="Building2" />
+        <StatCard title="Active Incubation" value={active} trend={5} icon="Users" />
+        <StatCard title="Graduated" value={startups.filter(s => s.status === 'GRADUATED').length} trend={8} icon="DollarSign" />
+        <StatCard title="Success Rate" value={68} trend={2} icon="CheckCircle" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center">
-              <TrendingUp size={18} className="mr-2 text-green-500" /> Top Performing Startups
+              <TrendingUp size={18} className="mr-2 text-green-500" /> Recent Startups
             </h2>
             <Link to="/dashboard/startups" className="text-sm text-[#0098c8] font-bold hover:underline">View All</Link>
           </div>
@@ -61,9 +67,9 @@ export const StartupDashboard = () => {
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm p-6">
             <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">Pipeline Metrics</h3>
             <div className="space-y-4">
-              {['Idea', 'Prototype', 'MVP', 'Market Launch', 'Growth'].map((stage, idx) => {
-                const count = MOCK_STARTUPS.filter(s => s.stage === stage).length;
-                const percentage = (count / total) * 100;
+              {['Idea Stage', 'MVP / Prototype', 'Pre-Seed', 'Seed', 'Growth / Scale'].map((stage, idx) => {
+                const count = startups.filter(s => s.stageName === stage).length;
+                const percentage = total === 0 ? 0 : (count / total) * 100;
                 return (
                   <div key={stage}>
                     <div className="flex justify-between text-sm mb-1">
@@ -85,8 +91,8 @@ export const StartupDashboard = () => {
           <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl p-5 flex items-start">
             <AlertCircle className="text-amber-600 dark:text-amber-400 mr-3 shrink-0 mt-0.5" size={20} />
             <div>
-              <h4 className="text-sm font-bold text-amber-800 dark:text-amber-400 mb-1">Pending Milestones</h4>
-              <p className="text-xs text-amber-700 dark:text-amber-500">14 startups have overdue milestones in their incubation program. Please review the pipeline.</p>
+              <h4 className="text-sm font-bold text-amber-800 dark:text-amber-400 mb-1">Pipeline Review</h4>
+              <p className="text-xs text-amber-700 dark:text-amber-500">Ensure to regularly update the progression metrics of the startups listed above.</p>
             </div>
           </div>
         </div>

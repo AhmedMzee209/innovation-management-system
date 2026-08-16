@@ -9,24 +9,24 @@ interface RoleBadgeProps {
 export const RoleBadge = ({ roleId, className }: RoleBadgeProps) => {
   const getRoleConfig = () => {
     switch (roleId) {
-      case 'ROLE_SUPER_ADMIN':
+      case 'SUPER_ADMIN':
         return { label: 'Super Admin', color: 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400 border-purple-200 dark:border-purple-800', icon: ShieldAlert };
-      case 'ROLE_INNOVATION_DIRECTOR':
+      case 'INNOVATION_DIRECTOR':
         return { label: 'Director', color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border-blue-200 dark:border-blue-800', icon: Star };
-      case 'ROLE_CENTRAL_HUB_MANAGER':
-      case 'ROLE_SCHOOL_HUB_MANAGER':
+      case 'CENTRAL_INNOVATION_MANAGER':
+      case 'CENTRAL_HUB_MANAGER':
+      case 'SCHOOL_INNOVATION_MANAGER':
+      case 'SCHOOL_HUB_MANAGER':
         return { label: 'Manager', color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800', icon: Shield };
-      case 'ROLE_MENTOR':
+      case 'MENTOR':
         return { label: 'Mentor', color: 'bg-teal-100 text-teal-700 dark:bg-teal-500/10 dark:text-teal-400 border-teal-200 dark:border-teal-800', icon: Briefcase };
-      case 'ROLE_REVIEWER':
+      case 'REVIEWER':
         return { label: 'Reviewer', color: 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400 border-orange-200 dark:border-orange-800', icon: BookOpen };
-      case 'ROLE_INNOVATOR':
+      case 'INNOVATOR':
         return { label: 'Innovator', color: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700', icon: GraduationCap };
-      case 'ROLE_INNOVATOR':
-        return { label: 'Innovator', color: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700', icon: GraduationCap };
-      case 'ROLE_INVESTOR':
+      case 'INVESTOR':
         return { label: 'Investor', color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800', icon: Briefcase };
-      case 'ROLE_PUBLIC_VISITOR':
+      case 'PUBLIC_VISITOR':
         return { label: 'Visitor', color: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border-gray-200 dark:border-gray-700', icon: Globe };
       default:
         return { label: 'User', color: 'bg-gray-100 text-gray-700 border-gray-200', icon: User };

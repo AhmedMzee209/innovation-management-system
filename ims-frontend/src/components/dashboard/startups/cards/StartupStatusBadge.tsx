@@ -1,19 +1,24 @@
-import { StartupStage, IncubationStatus, FundingStatus } from '@/data/mockStartups';
 import { cn } from '@/lib/utils';
 import { Lightbulb, Search, FlaskConical, Rocket, Users, Target, TrendingUp, CheckCircle, Clock, AlertTriangle, DollarSign, Leaf } from 'lucide-react';
 
-export const StageBadge = ({ stage, className }: { stage: StartupStage, className?: string }) => {
+export const StageBadge = ({ stage, className }: { stage: string, className?: string }) => {
   let color = 'bg-gray-100 text-gray-700';
   let Icon = Lightbulb;
 
   switch (stage) {
+    case 'Idea Stage':
     case 'Idea': color = 'bg-slate-100 text-slate-700'; Icon = Lightbulb; break;
     case 'Validation': color = 'bg-indigo-100 text-indigo-700'; Icon = Search; break;
+    case 'MVP / Prototype':
     case 'Prototype': color = 'bg-blue-100 text-blue-700'; Icon = FlaskConical; break;
+    case 'Pre-Seed':
     case 'MVP': color = 'bg-amber-100 text-amber-700'; Icon = Rocket; break;
     case 'Incubation': color = 'bg-purple-100 text-purple-700'; Icon = Users; break;
     case 'Market Launch': color = 'bg-pink-100 text-pink-700'; Icon = Target; break;
+    case 'Seed':
+    case 'Growth / Scale':
     case 'Growth': color = 'bg-emerald-100 text-emerald-700'; Icon = TrendingUp; break;
+    default: color = 'bg-gray-100 text-gray-700'; Icon = Lightbulb; break;
   }
 
   return (
@@ -24,7 +29,7 @@ export const StageBadge = ({ stage, className }: { stage: StartupStage, classNam
   );
 };
 
-export const IncubationBadge = ({ status, className }: { status: IncubationStatus, className?: string }) => {
+export const IncubationBadge = ({ status, className }: { status: string, className?: string }) => {
   let color = 'bg-gray-100 text-gray-700';
   let Icon = Clock;
 
@@ -43,7 +48,7 @@ export const IncubationBadge = ({ status, className }: { status: IncubationStatu
   );
 };
 
-export const FundingBadge = ({ status, className }: { status: FundingStatus, className?: string }) => {
+export const FundingBadge = ({ status, className }: { status: string, className?: string }) => {
   let color = 'bg-gray-100 text-gray-700';
   let Icon = DollarSign;
 

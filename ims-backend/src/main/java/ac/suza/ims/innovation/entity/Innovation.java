@@ -122,4 +122,8 @@ public class Innovation extends BaseEntity {
     @OneToMany(mappedBy = "innovation", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<InnovationStatusHistory> statusHistory = new ArrayList<>();
+
+    @OneToMany(mappedBy = "innovation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<InnovationTeamMember> teamMembers = new ArrayList<>();
 }

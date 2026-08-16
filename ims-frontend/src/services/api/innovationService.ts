@@ -21,19 +21,29 @@ export interface InnovationSummary {
 
 export interface InnovationStatusHistory {
   id: string;
-  status: string;
+  previousStatus: string;
+  currentStatus: string;
   remarks: string;
-  changedAt: string;
+  changedDate: string;
   changedByName: string;
 }
 
 export interface InnovationDocument {
   id: string;
-  fileName: string;
+  documentName: string;
   originalFileName: string;
-  mimeType: string;
-  size: number;
-  uploadedAt: string;
+  fileType: string;
+  fileSize: number;
+  documentType: string;
+  uploadDate: string;
+}
+
+export interface InnovationTeamMember {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  joinedDate: string;
 }
 
 export interface InnovationResponse {
@@ -61,6 +71,7 @@ export interface InnovationResponse {
   category: InnovationCategory;
   documents: InnovationDocument[];
   statusHistory: InnovationStatusHistory[];
+  teamMembers: InnovationTeamMember[];
 }
 
 export interface CreateInnovationRequest {
@@ -107,6 +118,10 @@ export const innovationService = {
     return response.data.data;
   },
 
+  submitInnovation: async (id: string): Promise<void> => {
+    await api.post(`/innovations/${id}/submit`);
+  },
+
   deleteInnovation: async (id: string): Promise<void> => {
     await api.delete(`/innovations/${id}`);
   },
@@ -119,5 +134,43 @@ export const innovationService = {
   createCategory: async (data: any): Promise<InnovationCategory> => {
     const response = await api.post('/categories', data);
     return response.data.data;
+  },
+
+  // Team Members
+  addTeamMember: async (innovationId: string, data: { name: string; email: string; role: string }): Promise<InnovationTeamMember> => {
+    const response = await api.post(`/innovations/${innovationId}/team-members`, data);
+    return response.data.data;
+  },
+
+  getTeamMembers: async (innovationId: string): Promise<InnovationTeamMember[]> => {
+    const response = await api.get(`/innovations/${innovationId}/team-members`);
+    return response.data.data;
+  },
+
+  removeTeamMember: async (innovationId: string, memberId: string): Promise<void> => {
+    await api.delete(`/innovations/${innovationId}/team-members/${memberId}`);
+  },
+
+  // Documents
+  uploadDocument: async (innovationId: string, file: File, documentType: string): Promise<InnovationDocument> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('documentType', documentType);
+    
+    const response = await api.post(`/innovations/${innovationId}/documents`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data.data;
+  },
+
+  getDocuments: async (innovationId: string): Promise<InnovationDocument[]> => {
+    const response = await api.get(`/innovations/${innovationId}/documents`);
+    return response.data.data;
+  },
+
+  deleteDocument: async (innovationId: string, documentId: string): Promise<void> => {
+    await api.delete(`/innovations/${innovationId}/documents/${documentId}`);
   }
 };

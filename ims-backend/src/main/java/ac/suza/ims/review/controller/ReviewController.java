@@ -1,6 +1,6 @@
 package ac.suza.ims.review.controller;
 
-import ac.suza.ims.auth.entity.User;
+import ac.suza.ims.security.model.CustomUserDetails;
 import ac.suza.ims.common.response.ApiResponse;
 import ac.suza.ims.review.dto.AssignReviewerRequest;
 import ac.suza.ims.review.dto.ReviewAssignmentResponse;
@@ -37,7 +37,7 @@ public class ReviewController {
     @PostMapping("/assign")
     public ResponseEntity<ApiResponse<ReviewAssignmentResponse>> assignReviewer(
             @Valid @RequestBody AssignReviewerRequest request,
-            @AuthenticationPrincipal User currentUser) {
+            @AuthenticationPrincipal CustomUserDetails currentUser) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.created("Reviewer assigned successfully",
                         assignmentService.assignReviewer(request, currentUser.getId())));
@@ -55,7 +55,7 @@ public class ReviewController {
     @Operation(summary = "Get my review assignments (for authenticated reviewer)")
     @GetMapping("/my")
     public ResponseEntity<ApiResponse<List<ReviewAssignmentResponse>>> getMyAssignments(
-            @AuthenticationPrincipal User currentUser) {
+            @AuthenticationPrincipal CustomUserDetails currentUser) {
         return ResponseEntity.ok(ApiResponse.success("Your assignments fetched successfully",
                 assignmentService.getMyAssignments(currentUser.getId())));
     }
@@ -66,7 +66,7 @@ public class ReviewController {
     @PostMapping
     public ResponseEntity<ApiResponse<ReviewResponse>> submitReview(
             @Valid @RequestBody SubmitReviewRequest request,
-            @AuthenticationPrincipal User currentUser) {
+            @AuthenticationPrincipal CustomUserDetails currentUser) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.created("Review submitted successfully",
                         reviewService.submitReview(request, currentUser.getId())));

@@ -15,8 +15,7 @@ const STEPS = [
   { id: 2, title: 'Details', icon: Briefcase },
   { id: 3, title: 'Business', icon: Building2 },
   { id: 4, title: 'Organizations', icon: Users },
-  { id: 5, title: 'Documents', icon: FileText },
-  { id: 6, title: 'Review', icon: CheckCircle2 },
+  { id: 5, title: 'Review', icon: CheckCircle2 },
 ];
 
 const schema = z.object({
@@ -49,7 +48,7 @@ export const SubmitInnovation = () => {
   const { register, handleSubmit, watch, trigger, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      innovationLevel: 'UNDERGRADUATE_PROJECT',
+      innovationLevel: 'IDEA',
       innovationType: 'PRODUCT'
     }
   });
@@ -74,7 +73,7 @@ export const SubmitInnovation = () => {
   const { mutate: createInnovation, isPending: isSubmitting } = useCreateInnovation();
 
   const nextStep = () => {
-    setCurrentStep(prev => Math.min(prev + 1, 6));
+    setCurrentStep(prev => Math.min(prev + 1, 5));
   };
   
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
@@ -110,22 +109,24 @@ export const SubmitInnovation = () => {
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 max-w-4xl mx-auto space-y-6">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight flex items-center justify-center">
-          <Rocket className="mr-3 text-[#0098c8]" size={32} />
+    <div className="p-4 md:p-6 lg:p-10 max-w-5xl mx-auto space-y-8 bg-gradient-to-b from-transparent to-blue-50/30 dark:to-blue-900/10 min-h-[calc(100vh-80px)] rounded-3xl">
+      <div className="text-center mb-10">
+        <div className="inline-flex items-center justify-center p-3 bg-blue-50 dark:bg-blue-900/30 rounded-2xl mb-4 shadow-inner">
+          <Rocket className="text-[#0098c8]" size={28} />
+        </div>
+        <h1 className="text-3xl md:text-4xl font-black tracking-tight flex items-center justify-center bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300">
           Submit Innovation
         </h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-2">Transform your idea into reality. Follow the steps below.</p>
+        <p className="text-gray-500 dark:text-gray-400 mt-3 text-lg max-w-2xl mx-auto">Transform your idea into reality. Follow the steps below to launch your project.</p>
       </div>
 
       {/* Progress Tracker */}
-      <div className="mb-8 overflow-x-auto pb-4">
-        <div className="flex items-center justify-between relative min-w-[500px]">
+      <div className="mb-10 w-full max-w-full">
+        <div className="flex items-center justify-between relative w-full px-2 md:px-6">
           <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-200 dark:bg-gray-800 -z-10 rounded-full"></div>
           <div 
             className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-[#0098c8] -z-10 rounded-full transition-all duration-500"
-            style={{ width: `${((currentStep - 1) / 5) * 100}%` }}
+            style={{ width: `${((currentStep - 1) / 4) * 100}%` }}
           ></div>
           
           {STEPS.map((step) => {
@@ -134,18 +135,18 @@ export const SubmitInnovation = () => {
             const isCompleted = step.id < currentStep;
             
             return (
-              <div key={step.id} className="flex flex-col items-center z-10">
+              <div key={step.id} className="flex flex-col items-center z-10 relative">
                 <div 
-                  className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300 ${
-                    isActive ? 'bg-white dark:bg-gray-900 border-[#0098c8] text-[#0098c8]' : 
-                    isCompleted ? 'bg-[#0098c8] border-[#0098c8] text-white' : 
-                    'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-400'
+                  className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                    isActive ? 'bg-white dark:bg-gray-900 border-[#0098c8] text-[#0098c8] shadow-[0_0_15px_rgba(0,152,200,0.4)] scale-110' : 
+                    isCompleted ? 'bg-gradient-to-r from-[#0098c8] to-blue-600 border-transparent text-white shadow-md' : 
+                    'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-400'
                   }`}
                 >
-                  {isCompleted ? <Check size={20} /> : <Icon size={18} />}
+                  {isCompleted ? <Check className="w-4 h-4 md:w-5 md:h-5" /> : <Icon className="w-4 h-4 md:w-4 md:h-4" />}
                 </div>
-                <span className={`text-xs font-bold mt-2 absolute -bottom-6 whitespace-nowrap ${isActive ? 'text-[#0098c8]' : 'text-gray-500'}`}>
-                  <span>{step.title}</span>
+                <span className={`text-[10px] md:text-xs font-bold mt-2 absolute -bottom-6 text-center w-16 md:w-24 left-1/2 -translate-x-1/2 leading-tight ${isActive ? 'text-[#0098c8]' : 'text-gray-500'}`}>
+                  {step.title}
                 </span>
               </div>
             );
@@ -154,19 +155,22 @@ export const SubmitInnovation = () => {
       </div>
 
       {/* Form Area */}
-      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm p-6 lg:p-8 mt-12 min-h-[400px]">
+      <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white dark:border-gray-800 rounded-3xl shadow-xl shadow-blue-900/5 p-6 md:p-8 lg:p-10 min-h-[450px]">
         <form onSubmit={handleSubmit(onSubmit)}>
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStep}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
             >
               {currentStep === 1 && (
                 <div className="space-y-6">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-800 pb-2">Basic Information</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                    <span className="bg-[#0098c8] w-2 h-6 rounded-full mr-3"></span>
+                    Basic Information
+                  </h2>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Innovation Title *</label>
                     <input {...register('title')} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-[#0098c8] bg-gray-50 dark:bg-gray-800/50" placeholder="Enter a catchy title" />
@@ -190,11 +194,10 @@ export const SubmitInnovation = () => {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Innovation Level *</label>
                       <select {...register('innovationLevel')} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-[#0098c8] bg-gray-50 dark:bg-gray-800/50">
-                        <option value="UNDERGRADUATE_PROJECT">Undergraduate Project</option>
-                        <option value="POSTGRADUATE_RESEARCH">Postgraduate Research</option>
-                        <option value="INDEPENDENT_INNOVATION">Independent Innovation</option>
-                        <option value="FACULTY_RESEARCH">Faculty Research</option>
-                        <option value="INCUBATION">Incubation</option>
+                        <option value="IDEA">Idea</option>
+                        <option value="PROTOTYPE">Prototype</option>
+                        <option value="MVP">Minimum Viable Product (MVP)</option>
+                        <option value="STARTUP_READY">Startup Ready</option>
                       </select>
                       {errors.innovationLevel && <p className="text-red-500 text-xs mt-1">{errors.innovationLevel.message}</p>}
                     </div>
@@ -202,10 +205,10 @@ export const SubmitInnovation = () => {
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Innovation Type *</label>
                       <select {...register('innovationType')} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-[#0098c8] bg-gray-50 dark:bg-gray-800/50">
                         <option value="PRODUCT">Product</option>
-                        <option value="PROCESS">Process</option>
                         <option value="SERVICE">Service</option>
-                        <option value="BUSINESS_MODEL">Business Model</option>
-                        <option value="SOCIAL">Social</option>
+                        <option value="PROCESS">Process</option>
+                        <option value="RESEARCH">Research</option>
+                        <option value="SOCIAL_INNOVATION">Social Innovation</option>
                       </select>
                       {errors.innovationType && <p className="text-red-500 text-xs mt-1">{errors.innovationType.message}</p>}
                     </div>
@@ -215,7 +218,10 @@ export const SubmitInnovation = () => {
 
               {currentStep === 2 && (
                 <div className="space-y-6">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-800 pb-2">Deep Dive Details</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                    <span className="bg-blue-500 w-2 h-6 rounded-full mr-3"></span>
+                    Deep Dive Details
+                  </h2>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Problem Statement *</label>
                     <textarea {...register('problemStatement')} rows={4} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-[#0098c8] bg-gray-50 dark:bg-gray-800/50" placeholder="What problem are you solving?" />
@@ -235,7 +241,10 @@ export const SubmitInnovation = () => {
 
               {currentStep === 3 && (
                 <div className="space-y-6">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-800 pb-2">Business & Market</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                    <span className="bg-indigo-500 w-2 h-6 rounded-full mr-3"></span>
+                    Business & Market
+                  </h2>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target Beneficiaries</label>
                     <input {...register('targetBeneficiaries')} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-[#0098c8] bg-gray-50 dark:bg-gray-800/50" placeholder="Who will use this?" />
@@ -249,7 +258,10 @@ export const SubmitInnovation = () => {
 
               {currentStep === 4 && (
                 <div className="space-y-6">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-800 pb-2">Organizations</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                    <span className="bg-purple-500 w-2 h-6 rounded-full mr-3"></span>
+                    Organizations
+                  </h2>
                   <div className="grid grid-cols-1 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">School *</label>
@@ -288,15 +300,11 @@ export const SubmitInnovation = () => {
               )}
 
               {currentStep === 5 && (
-                <div className="py-12 text-center border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl">
-                  <p className="text-gray-500">Document Upload</p>
-                  <p className="text-xs text-gray-400 mt-2">Documents can be added after the innovation is created from the Details page.</p>
-                </div>
-              )}
-
-              {currentStep === 6 && (
                 <div className="space-y-6">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-800 pb-2">Review & Submit</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                    <span className="bg-green-500 w-2 h-6 rounded-full mr-3"></span>
+                    Review & Submit
+                  </h2>
                   <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/30 p-4 rounded-xl text-sm text-blue-800 dark:text-blue-300">
                     <p className="font-bold mb-1">Almost there!</p>
                     <p>Please review your application carefully. Once submitted, it will be routed to your School's Innovation Hub for initial screening.</p>
@@ -322,24 +330,24 @@ export const SubmitInnovation = () => {
               </Link>
             )}
             
-            {currentStep < 6 ? (
+            {currentStep < 5 ? (
               <button 
                 type="button" 
                 onClick={handleNext}
-                className="px-6 py-2.5 text-sm font-bold bg-[#0098c8] text-white rounded-lg hover:bg-[#007aa3] transition-colors shadow-md flex items-center"
+                className="px-8 py-3 text-sm font-bold bg-gradient-to-r from-[#0098c8] to-blue-600 text-white rounded-xl hover:from-[#007aa3] hover:to-blue-700 transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 flex items-center transform hover:-translate-y-0.5"
               >
-                Next Step <ChevronRight size={16} className="ml-1" />
+                Next Step <ChevronRight size={18} className="ml-2" />
               </button>
             ) : (
               <button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="px-6 py-2.5 text-sm font-bold bg-[#0098c8] text-white rounded-lg hover:bg-[#007aa3] transition-colors shadow-md flex items-center disabled:opacity-70"
+                className="px-8 py-3 text-sm font-bold bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg shadow-green-500/30 hover:shadow-green-500/50 flex items-center disabled:opacity-70 disabled:transform-none transform hover:-translate-y-0.5"
               >
                 {isSubmitting ? (
-                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
+                  <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processing...</>
                 ) : (
-                  <><Check size={16} className="mr-2" /> Submit Innovation</>
+                  <><Check size={18} className="mr-2" /> Submit Innovation</>
                 )}
               </button>
             )}
